@@ -1,10 +1,14 @@
 package me.lemurxd.skyblockplugin.commands;
 
+import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
+import me.lemurxd.skyblockplugin.craftings.Generator;
+import me.lemurxd.skyblockplugin.utils.SafeGive;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Panda;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +51,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                     target = (Player) sender;
                 }
 
-
+                SafeGive.giv(StoneGenerator.getItemStack(), target);
                 sender.sendMessage("§aPomyślnie dano stoniarkę graczowi " + target.getName());
                 return true;
             }

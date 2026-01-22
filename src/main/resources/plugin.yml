@@ -2,7 +2,7 @@ name: SkyblockPlugin
 version: 1.0.0
 main: me.lemurxd.skyblockplugin.Main
 api-version: 1.21
-authors: lemurxd
+author: lemurxd
 description: Basic bundle for SkyBlock servers.
 
 commands:

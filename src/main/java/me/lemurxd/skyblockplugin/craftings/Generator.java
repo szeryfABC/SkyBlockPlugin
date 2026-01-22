@@ -1,7 +1,9 @@
 package me.lemurxd.skyblockplugin.craftings;
 
 import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import me.lemurxd.skyblockplugin.enums.Config;
+import me.lemurxd.skyblockplugin.utils.NBTUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -16,9 +18,10 @@ public class Generator {
     public static ShapedRecipe getRecipe() {
         NamespacedKey key = new NamespacedKey(Main.getInstance(), "stoneGenerator");
         List<String> shapeStrings = (List<String>) Config.GENERATOR_RECIPE_SHAPE.getStringList();
-        List<String> ingredientStrings = (List<String>) Config.GENERATOR_RECIPE_SHAPE.getStringList();
+        List<String> ingredientStrings = (List<String>) Config.GENERATOR_RECIPE_INGREDIENTS.getStringList();
 
-        ShapedRecipe recipe = new ShapedRecipe(key, getItemStack());
+        ShapedRecipe recipe = new ShapedRecipe(key, StoneGenerator.getItemStack());
+        recipe.shape(shapeStrings.toArray(new String[0]));
 
         for (String entry : ingredientStrings) {
             try {
@@ -34,35 +37,6 @@ public class Generator {
 
         return recipe;
 
-    }
-
-    public static ItemStack getItemStack() {
-        ItemStack stoniarka = new ItemStack(Material.END_STONE);
-        ItemMeta meta = stoniarka.getItemMeta();
-
-        if (meta != null) {
-            meta.setDisplayName("§6§l⭐ MAGICZNA STONIARKA ⭐");
-
-            List<String> lore = new ArrayList<>();
-            lore.add("§8§m-----------------------");
-            lore.add("§7To urządzenie generuje");
-            lore.add("§fNieskończone pokłady kamienia.");
-            lore.add("");
-            lore.add("§e§lINSTRUKCJA:");
-            lore.add(" §8» §fPostaw na ziemi, aby zacząć.");
-            lore.add(" §8» §fZniszcz kilofem, by odzyskać.");
-            lore.add("");
-            lore.add("§c§lUWAGA: §7Działa natychmiastowo!");
-            lore.add("§8§m-----------------------");
-            meta.setLore(lore);
-
-            meta.addEnchant(org.bukkit.enchantments.Enchantment.LUCK_OF_THE_SEA, 1, true);
-            meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
-
-            stoniarka.setItemMeta(meta);
-        }
-
-        return stoniarka;
     }
 
 }

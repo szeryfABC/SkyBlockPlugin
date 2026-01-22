@@ -1,5 +1,8 @@
 package me.lemurxd.skyblockplugin;
 
+import me.lemurxd.skyblockplugin.Listeners.BlockBreak;
+import me.lemurxd.skyblockplugin.Listeners.BlockPlace;
+import me.lemurxd.skyblockplugin.commands.SkyBlockPluginCommand;
 import me.lemurxd.skyblockplugin.craftings.Generator;
 import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.tasks.PlayerY;
@@ -26,6 +29,12 @@ public class Main extends JavaPlugin {
         }
 
         Bukkit.addRecipe(Generator.getRecipe());
+
+
+        Bukkit.getPluginManager().registerEvents(new BlockBreak(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new BlockPlace(), getInstance());
+
+        getCommand("skyblockplugin").setExecutor(new SkyBlockPluginCommand());
 
     }
 

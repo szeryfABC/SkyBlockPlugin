@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 public class SafeGive {
 
-    public SafeGive(ItemStack item, Player p) {
+    public static void giv(ItemStack item, Player p) {
         Iterator<ItemStack> iter = p.getInventory().addItem(item).values().iterator();
         while (iter.hasNext()) {
             p.getWorld().dropItemNaturally(p.getLocation(), iter.next());

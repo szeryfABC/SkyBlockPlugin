@@ -31,16 +31,17 @@ public enum Config {
     //GAME SPAWN
     SAFE_SPAWN_ENABLED("safe.spawn.enabled", false),
     SAFE_SPAWN_WORLD("safe.spawn_world", "spawn"),
-    SAFE_SPAWN_X("safe.spawn_x", 0),
-    SAFE_SPAWN_Y("safe.spawn_y", 65),
-    SAFE_SPAWN_Z("safe.spawn_z", 0),
+    SAFE_SPAWN_X("safe.spawn_x", -43),
+    SAFE_SPAWN_Y("safe.spawn_y", 144),
+    SAFE_SPAWN_Z("safe.spawn_z", -24),
     SAFE_SPAWN_FACING_X("safe.spawn.facing_x", 90),
     SAFE_SPAWN_FACING_Y("safe.spawn.facing_y", 0),
 
     //STONE-GENERATOR
     GENERATOR_RECIPE_ENABLED("generator.recipe.enabled", true),
     GENERATOR_RECIPE_SHAPE("generator.recipe.shape", Arrays.asList("AAA", "ABA", "AAA")),
-    GENERATOR_RECIPE_INGREDIENTS("generator.recipe.ingredients", Arrays.asList("A: STONE", "B: DIAMOND_PICKAXE"))
+    GENERATOR_RECIPE_INGREDIENTS("generator.recipe.ingredients", Arrays.asList("A: STONE", "B: DIAMOND_PICKAXE")),
+    GENERATOR_TIME_TO_REGEN("generator.regen.time", 2)
 
     ;
 
