@@ -6,5 +6,6 @@ import org.bukkit.inventory.ItemStack;
 public class SafeGive {
 
     public SafeGive(ItemStack item, Player p) {
-        }
+
+    }
 }
