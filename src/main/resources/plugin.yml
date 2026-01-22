@@ -1,0 +1,19 @@
+name: SkyblockPlugin
+version: 1.0.0
+main: me.lemurxd.skyblockplugin.Main
+api-version: 1.21
+authors: lemurxd
+description: Basic bundle for SkyBlock servers.
+
+commands:
+  skyblockplugin:
+    description: Główna komenda zarzadzania pluginem
+    aliases: [sbp]
+    usage: /sbp give <przedmiot> [gracz]
+    permission: sbp.admin
+    permission-message: "§cNie masz uprawnień do tej komendy!"
+
+permissions:
+  sbp.admin:
+    description: Daje dostęp do komend admina (/sbp give)
+    default: op
