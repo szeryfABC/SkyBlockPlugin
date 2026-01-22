@@ -1,5 +1,6 @@
 package me.lemurxd.skyblockplugin;
 
+import me.lemurxd.skyblockplugin.craftings.Generator;
 import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.tasks.PlayerY;
 import org.bukkit.Bukkit;
@@ -23,6 +24,9 @@ public class Main extends JavaPlugin {
         if (Config.SAFE_SPAWN_ENABLED.getBoolean()) {
             PlayerY.runPlayerYRespawnTimer();
         }
+
+        Bukkit.addRecipe(Generator.getRecipe());
+
     }
 
     public static Main getInstance() {
