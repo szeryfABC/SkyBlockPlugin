@@ -2,6 +2,7 @@ package me.lemurxd.skyblockplugin.Listeners;
 
 import me.lemurxd.skyblockplugin.Main;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
+import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.utils.SafeGive;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,7 +44,7 @@ public class BlockBreak implements Listener {
         if (StoneGenerator.isStoneGenerator(underLoc)) {
             Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                 blockLoc.getBlock().setType(Material.STONE);
-            }, 1L);
+            }, Config.GENERATOR_TIME_TO_REGEN.getInt()*20L);
         }
     }
 

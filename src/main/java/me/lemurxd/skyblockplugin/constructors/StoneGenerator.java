@@ -12,7 +12,6 @@ import java.util.*;
 
 public class StoneGenerator {
 
-    // Zmieniamy klucz mapy na Optional<Island>
     private static HashMap<Optional<Island>, List<StoneGenerator>> generatorMap = new HashMap<>();
 
     private Location location;

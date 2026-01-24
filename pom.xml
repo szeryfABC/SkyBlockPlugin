@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.lemurxd.skyblockplugin</groupId>
-    <artifactId>untitled</artifactId>
+    <artifactId>SkyBlockPlugin</artifactId>
     <version>0.0</version>
 
     <properties>
