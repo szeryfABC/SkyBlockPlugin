@@ -7,7 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
+import net.kyori.adventure.text.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  * @note Integrated and modified with explicit permission from the original author.
  */
 public enum Config {
+    //Main
+    MAIN_PREFIX("main.variables_prefix", "&a&lOF &f| ", true),
 
     //GAME SPAWN
     SAFE_SPAWN_ENABLED("safe.spawn.enabled", false),

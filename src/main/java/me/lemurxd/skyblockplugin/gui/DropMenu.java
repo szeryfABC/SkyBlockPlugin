@@ -1,0 +1,289 @@
+package me.lemurxd.skyblockplugin.gui;
+
+import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.constructors.DropEntry;
+import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
+import me.lemurxd.skyblockplugin.enums.Config;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class DropMenu {
+
+    public void open(Player player) {
+        SkyBlockUser user = SkyBlockUser.getSkyBlockUser(player.getUniqueId());
+
+        if (user == null) {
+            player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + "Błąd: Nie załadowano Twoich danych!");
+            return;
+        }
+
+        Inventory inv = Bukkit.createInventory(null, 36, ChatColor.DARK_GRAY + "Zarządzanie Dropem (Lvl: " + user.getDropLevel() + ")");
+
+        List<DropEntry> userDrops = user.getDrops();
+
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        int fortuneLevel = mainHand.getEnchantmentLevel(Enchantment.FORTUNE);
+        boolean hasSilkTouch = mainHand.containsEnchantment(Enchantment.SILK_TOUCH);
+
+        int startSlot = 9 + (9 - userDrops.size()) / 2;
+
+        for (int i = 0; i < userDrops.size(); i++) {
+            DropEntry entry = userDrops.get(i);
+
+            ItemStack icon = entry.dropItem().clone();
+            ItemMeta meta = icon.getItemMeta();
+
+            String polishName = getPolishName(icon.getType());
+            if (icon.getType() == Material.STONE && !hasSilkTouch) {
+                polishName = ChatColor.GRAY + "Bruk (Brak SilkTouch)";
+                icon.setType(Material.COBBLESTONE);
+            }
+
+            meta.setDisplayName(polishName);
+
+            double baseChance = entry.chance();
+            double boostedChance = baseChance * (fortuneLevel + 1);
+            if (boostedChance > 100.0) {
+                boostedChance = 100.0;
+            }
+
+            List<String> lore = new ArrayList<>();
+            lore.add(" ");
+            lore.add(ChatColor.GRAY + "Podstawowa szansa: " + ChatColor.YELLOW + baseChance + "%");
+
+            if (fortuneLevel > 0) {
+                lore.add(ChatColor.GRAY + "Bonus z Fortuny " + fortuneLevel + ": " + ChatColor.GOLD + "x" + (fortuneLevel + 1));
+                lore.add(ChatColor.GRAY + "Twoja szansa: " + ChatColor.GREEN + ChatColor.BOLD + String.format("%.2f", boostedChance) + "%");
+            } else {
+                lore.add(ChatColor.GRAY + "Twoja szansa: " + ChatColor.GREEN + ChatColor.BOLD + baseChance + "%");
+                lore.add(ChatColor.DARK_GRAY + "(Użyj kilofa z Fortuną aby zwiększyć!)");
+            }
+
+            lore.add(" ");
+
+            if (entry.enabled()) {
+                lore.add(ChatColor.GREEN + "✔ AKTYWNY");
+                lore.add(ChatColor.GRAY + "Kliknij, aby wyłączyć");
+                meta.addEnchant(Enchantment.UNBREAKING, 1, true);
+                org.bukkit.inventory.meta.ItemMeta finalMeta = meta;
+                finalMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
+            } else {
+                lore.add(ChatColor.RED + "✖ WYŁĄCZONY");
+                lore.add(ChatColor.GRAY + "Kliknij, aby włączyć");
+            }
+
+            meta.setLore(lore);
+            icon.setItemMeta(meta);
+
+            inv.setItem(startSlot + i, icon);
+        }
+
+
+        ItemStack previewBtn = new ItemStack(Material.BOOK);
+        ItemMeta previewMeta = previewBtn.getItemMeta();
+        previewMeta.setDisplayName(ChatColor.AQUA + "Podgląd Dropu");
+        previewMeta.setLore(Arrays.asList(
+                ChatColor.GRAY + "Kliknij, aby zobaczyć jakie przedmioty",
+                ChatColor.GRAY + "wypadają na innych poziomach."
+        ));
+        previewBtn.setItemMeta(previewMeta);
+        inv.setItem(29, previewBtn);
+
+
+        ItemStack upgradeBtn = new ItemStack(Material.EXPERIENCE_BOTTLE);
+        ItemMeta upgradeMeta = upgradeBtn.getItemMeta();
+        int currentLevel = user.getDropLevel();
+        int nextLevel = currentLevel + 1;
+        double cost = getUpgradeCost(currentLevel);
+
+        if (currentLevel >= 5) {
+            upgradeMeta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "MAKSYMALNY POZIOM");
+            upgradeMeta.setLore(Arrays.asList(
+                    ChatColor.GRAY + "Osiągnięto już maksymalny",
+                    ChatColor.GRAY + "poziom dropu: " + ChatColor.AQUA + "5"
+            ));
+        } else {
+            upgradeMeta.setDisplayName(ChatColor.GOLD + "" + ChatColor.BOLD + "ULEPSZ POZIOM DROPU");
+            List<String> upgradeLore = new ArrayList<>();
+            upgradeLore.add(ChatColor.GRAY + "Obecny poziom: " + ChatColor.AQUA + currentLevel);
+            upgradeLore.add(ChatColor.GRAY + "Następny poziom: " + ChatColor.AQUA + nextLevel);
+            upgradeLore.add(" ");
+            upgradeLore.add(ChatColor.GRAY + "Koszt: " + ChatColor.GREEN + cost + "$");
+
+            if (Main.getEconomy() != null) {
+                if (Main.getEconomy().has(player, cost)) {
+                    upgradeLore.add(ChatColor.YELLOW + "Kliknij, aby kupić ulepszenie!");
+                } else {
+                    upgradeLore.add(ChatColor.RED + "Nie stać Cię! Brakuje: " + (cost - Main.getEconomy().getBalance(player)) + "$");
+                }
+            }
+
+            upgradeMeta.setLore(upgradeLore);
+        }
+
+        upgradeBtn.setItemMeta(upgradeMeta);
+        inv.setItem(31, upgradeBtn);
+
+        fillEmptySlots(inv);
+        player.openInventory(inv);
+    }
+
+    public void openPreviewSelection(Player player) {
+        Inventory inv = Bukkit.createInventory(null, 27, ChatColor.DARK_GRAY + "Wybierz poziom do podglądu");
+
+        player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
+
+        int[] slots = {11, 12, 13, 14, 15};
+        for (int i = 1; i <= 5; i++) {
+            ItemStack icon = new ItemStack(Material.PAPER);
+            ItemMeta meta = icon.getItemMeta();
+            meta.setDisplayName(ChatColor.GOLD + "Poziom " + i);
+            meta.setLore(Arrays.asList(ChatColor.GRAY + "Kliknij, aby zobaczyć dropy."));
+            icon.setItemMeta(meta);
+            inv.setItem(slots[i-1], icon);
+        }
+
+        ItemStack back = new ItemStack(Material.ARROW);
+        ItemMeta backMeta = back.getItemMeta();
+        backMeta.setDisplayName(ChatColor.RED + "Powrót");
+        back.setItemMeta(backMeta);
+        inv.setItem(22, back);
+
+        fillEmptySlots(inv);
+        player.openInventory(inv);
+    }
+
+    public void openLevelPreview(Player player, int level) {
+        Inventory inv = Bukkit.createInventory(null, 36, ChatColor.DARK_GRAY + "Podgląd: Poziom " + level);
+
+        player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
+
+        List<DropEntry> drops = SkyBlockUser.getDropsForLevel(level);
+        int startSlot = 9 + (9 - drops.size()) / 2;
+
+        for (int i = 0; i < drops.size(); i++) {
+            DropEntry entry = drops.get(i);
+            ItemStack icon = entry.dropItem().clone();
+            ItemMeta meta = icon.getItemMeta();
+            meta.setDisplayName(getPolishName(icon.getType()));
+
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Szansa bazowa: " + ChatColor.YELLOW + entry.chance() + "%");
+            meta.setLore(lore);
+            icon.setItemMeta(meta);
+
+            inv.setItem(startSlot + i, icon);
+        }
+
+        ItemStack back = new ItemStack(Material.ARROW);
+        ItemMeta backMeta = back.getItemMeta();
+        backMeta.setDisplayName(ChatColor.RED + "Powrót do menu");
+        back.setItemMeta(backMeta);
+        inv.setItem(31, back);
+
+        fillEmptySlots(inv);
+        player.openInventory(inv);
+    }
+
+    public void upgradeLevel(Player player) {
+        SkyBlockUser user = SkyBlockUser.getSkyBlockUser(player.getUniqueId());
+        if (user == null) return;
+
+        if (user.getDropLevel() >= 5) {
+            player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + "Osiągnąłeś już maksymalny poziom!");
+            return;
+        }
+
+        double cost = getUpgradeCost(user.getDropLevel());
+
+        if (Main.getEconomy() != null) {
+            if (!Main.getEconomy().has(player, cost)) {
+                player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + "Nie masz wystarczająco pieniędzy! Potrzebujesz: " + cost + "$");
+                return;
+            }
+            Main.getEconomy().withdrawPlayer(player, cost);
+        }
+
+        int newLevel = user.getDropLevel() + 1;
+        user.setDropLevel(newLevel);
+
+        player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.GREEN + "Pomyślnie ulepszono poziom dropu na: " + newLevel + " (-" + cost + "$)");
+
+        player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F);
+
+        open(player);
+    }
+
+    public void toggleDrop(Player player, int index) {
+        SkyBlockUser user = SkyBlockUser.getSkyBlockUser(player.getUniqueId());
+        if (user == null) return;
+        List<DropEntry> drops = user.getDrops();
+
+        int startSlot = 9 + (9 - drops.size()) / 2;
+        int realIndex = index - startSlot;
+
+        if (realIndex < 0 || realIndex >= drops.size()) return;
+
+        DropEntry oldEntry = drops.get(realIndex);
+        DropEntry newEntry = new DropEntry(oldEntry.dropItem(), oldEntry.chance(), !oldEntry.enabled());
+        drops.set(realIndex, newEntry);
+
+        if (newEntry.enabled() == true) {
+            player.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 1.2F);
+        } else {
+            player.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 0.8F);
+        }
+
+        open(player);
+    }
+
+    private void fillEmptySlots(Inventory inv) {
+        ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+        ItemMeta fillerMeta = filler.getItemMeta();
+        fillerMeta.setDisplayName(" ");
+        filler.setItemMeta(fillerMeta);
+
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (inv.getItem(i) == null || inv.getItem(i).getType() == Material.AIR) {
+                inv.setItem(i, filler);
+            }
+        }
+    }
+
+    private double getUpgradeCost(int currentLevel) {
+        switch (currentLevel) {
+            case 1: return 5000.0;
+            case 2: return 20000.0;
+            case 3: return 50000.0;
+            case 4: return 100000.0;
+            case 5: return 100000.0;
+            default: return 999999.0;
+        }
+    }
+
+    private String getPolishName(Material mat) {
+        switch (mat) {
+            case STONE: return ChatColor.GRAY + "Kamień";
+            case COBBLESTONE: return ChatColor.GRAY + "Bruk";
+            case COAL: return ChatColor.DARK_GRAY + "Węgiel";
+            case IRON_INGOT: return ChatColor.GRAY + "Sztabka Żelaza";
+            case COPPER_INGOT: return ChatColor.GOLD + "Sztabka Miedzi";
+            case GOLD_INGOT: return ChatColor.YELLOW + "Sztabka Złota";
+            case DIAMOND: return ChatColor.AQUA + "Diament";
+            case EMERALD: return ChatColor.GREEN + "Szmaragd";
+            case NETHERITE_SCRAP: return ChatColor.DARK_PURPLE + "Odłamek Netheritu";
+            default: return ChatColor.WHITE + mat.name();
+        }
+    }
+}

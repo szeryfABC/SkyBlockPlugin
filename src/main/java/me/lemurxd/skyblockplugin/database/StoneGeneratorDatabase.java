@@ -129,6 +129,16 @@ public class StoneGeneratorDatabase {
         }
         return list;
     }
+    public void deleteGeneratorsForIsland(String islandId) {
+        String sql = "DELETE FROM stone_generators WHERE island_id = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, islandId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public Map<Optional<Island>, List<StoneGenerator>> loadGenerators(IslandProvider islandProvider) {
         Map<Optional<Island>, List<StoneGenerator>> result = new HashMap<>();

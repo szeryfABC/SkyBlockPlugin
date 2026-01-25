@@ -1,6 +1,7 @@
 name: SkyblockPlugin
 version: 1.0.0
 main: me.lemurxd.skyblockplugin.Main
+depend: [BentoBox, Vault]
 api-version: 1.21
 author: lemurxd
 description: Basic bundle for SkyBlock servers.
@@ -12,6 +13,9 @@ commands:
     usage: /sbp give <przedmiot> [gracz]
     permission: sbp.admin
     permission-message: "§cNie masz uprawnień do tej komendy!"
+  drop:
+    description: Otwiera menu zarządzania dropem
+    usage: /drop
 
 permissions:
   sbp.admin:

@@ -6,7 +6,7 @@
 
     <groupId>me.lemurxd.skyblockplugin</groupId>
     <artifactId>SkyBlockPlugin</artifactId>
-    <version>0.0</version>
+    <version>0.1</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -29,6 +29,10 @@
             <id>codemc-repo</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -48,6 +52,12 @@
             <groupId>world.bentobox</groupId>
             <artifactId>bskyblock</artifactId>
             <version>${bskyblock.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
