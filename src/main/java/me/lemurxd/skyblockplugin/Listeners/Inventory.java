@@ -4,6 +4,7 @@ import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.gui.DropMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,14 +25,14 @@ public class Inventory implements Listener {
             Player player = (Player) event.getWhoClicked();
             int slot = event.getSlot();
 
-            if (slot == 31) {
+            if (slot == 40) {
                 dropMenu.upgradeLevel(player);
             }
-            else if (slot == 29) {
+            else if (slot == 38) {
                 dropMenu.openPreviewSelection(player);
             }
             else {
-                if (slot >= 9 && slot <= 17) {
+                if (slot >= 9 && slot <= 25) {
                     dropMenu.toggleDrop(player, slot);
                 }
             }
@@ -43,6 +44,7 @@ public class Inventory implements Listener {
 
             int slot = event.getSlot();
             if (slot == 22) {
+                player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
                 dropMenu.open(player);
             }
             else if (slot >= 11 && slot <= 15) {
@@ -57,6 +59,7 @@ public class Inventory implements Listener {
             Player player = (Player) event.getWhoClicked();
 
             if (event.getSlot() == 31) {
+                player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
                 dropMenu.open(player);
             }
         }

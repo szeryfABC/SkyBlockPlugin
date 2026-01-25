@@ -28,7 +28,7 @@ public class DropMenu {
             return;
         }
 
-        Inventory inv = Bukkit.createInventory(null, 36, ChatColor.DARK_GRAY + "Zarządzanie Dropem (Lvl: " + user.getDropLevel() + ")");
+        Inventory inv = Bukkit.createInventory(null, 45, ChatColor.DARK_GRAY + "Zarządzanie Dropem (Lvl: " + user.getDropLevel() + ")");
 
         List<DropEntry> userDrops = user.getDrops();
 
@@ -36,9 +36,12 @@ public class DropMenu {
         int fortuneLevel = mainHand.getEnchantmentLevel(Enchantment.FORTUNE);
         boolean hasSilkTouch = mainHand.containsEnchantment(Enchantment.SILK_TOUCH);
 
-        int startSlot = 9 + (9 - userDrops.size()) / 2;
-
         for (int i = 0; i < userDrops.size(); i++) {
+            int row = i / 7;
+            int column = i % 7;
+
+            int slot = 10 + column + (row * 9);
+
             DropEntry entry = userDrops.get(i);
 
             ItemStack icon = entry.dropItem().clone();
@@ -86,7 +89,7 @@ public class DropMenu {
             meta.setLore(lore);
             icon.setItemMeta(meta);
 
-            inv.setItem(startSlot + i, icon);
+            inv.setItem(slot, icon);
         }
 
 
@@ -98,7 +101,7 @@ public class DropMenu {
                 ChatColor.GRAY + "wypadają na innych poziomach."
         ));
         previewBtn.setItemMeta(previewMeta);
-        inv.setItem(29, previewBtn);
+        inv.setItem(38, previewBtn);
 
 
         ItemStack upgradeBtn = new ItemStack(Material.EXPERIENCE_BOTTLE);
@@ -133,7 +136,7 @@ public class DropMenu {
         }
 
         upgradeBtn.setItemMeta(upgradeMeta);
-        inv.setItem(31, upgradeBtn);
+        inv.setItem(40, upgradeBtn);
 
         fillEmptySlots(inv);
         player.openInventory(inv);
@@ -225,24 +228,36 @@ public class DropMenu {
         open(player);
     }
 
-    public void toggleDrop(Player player, int index) {
+    public void toggleDrop(Player player, int slot) {
         SkyBlockUser user = SkyBlockUser.getSkyBlockUser(player.getUniqueId());
         if (user == null) return;
+
         List<DropEntry> drops = user.getDrops();
 
-        int startSlot = 9 + (9 - drops.size()) / 2;
-        int realIndex = index - startSlot;
+        int guiColumn = slot % 9;
+        if (guiColumn < 1 || guiColumn > 7) {
+            return;
+        }
 
-        if (realIndex < 0 || realIndex >= drops.size()) return;
+        int row = (slot / 9) - 1;
+        if (row < 0) {
+            return;
+        }
+
+        int realIndex = (row * 7) + (guiColumn - 1);
+
+        if (realIndex < 0 || realIndex >= drops.size()) {
+            return;
+        }
 
         DropEntry oldEntry = drops.get(realIndex);
         DropEntry newEntry = new DropEntry(oldEntry.dropItem(), oldEntry.chance(), !oldEntry.enabled());
         drops.set(realIndex, newEntry);
 
-        if (newEntry.enabled() == true) {
-            player.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 1.2F);
+        if (newEntry.enabled()) {
+            player.playSound(player.getLocation(), Sound.BLOCK_COPPER_BULB_TURN_ON, 1.0f, 1.0f);
         } else {
-            player.playSound(player, Sound.UI_BUTTON_CLICK, 1.0F, 0.8F);
+            player.playSound(player.getLocation(), Sound.BLOCK_COPPER_BULB_TURN_OFF, 1.0f, 1.0f);
         }
 
         open(player);
