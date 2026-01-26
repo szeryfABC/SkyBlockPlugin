@@ -26,11 +26,11 @@ public class DropMenu {
         SkyBlockUser user = SkyBlockUser.getSkyBlockUser(player.getUniqueId());
 
         if (user == null) {
-            player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + "Błąd: Nie załadowano Twoich danych!");
+            player.sendMessage(Config.MESSAGES_DROP_DATABASE_PROBLEM.getString());
             return;
         }
 
-        Inventory inv = Bukkit.createInventory(null, 45, ChatColor.DARK_GRAY + "Zarządzanie Dropem (Lvl: " + user.getDropLevel() + ")");
+        Inventory inv = Bukkit.createInventory(null, Config.DROP_MAIN_GUI_ROWS.getInt()*9, Config.DROP_MAIN_GUI_NAME.getString().replaceAll("<drop.level>", ""+user.getDropLevel()));
 
         List<DropEntry> userDrops = user.getDrops();
 
@@ -47,13 +47,10 @@ public class DropMenu {
             DropEntry entry = userDrops.get(i);
 
             ItemStack icon = entry.dropItem().clone();
+            if (icon.getType() == Material.STONE && !hasSilkTouch) icon.setType(Material.COBBLESTONE);
             ItemMeta meta = icon.getItemMeta();
 
             String polishName = getPolishName(icon);
-            if (icon.getType() == Material.STONE && !hasSilkTouch) {
-                polishName = ChatColor.GRAY + "Bruk (Brak SilkTouch)";
-                icon.setType(Material.COBBLESTONE);
-            }
 
             meta.setDisplayName(polishName);
 
@@ -145,7 +142,7 @@ public class DropMenu {
     }
 
     public void openPreviewSelection(Player player) {
-        Inventory inv = Bukkit.createInventory(null, 27, ChatColor.DARK_GRAY + "Wybierz poziom do podglądu");
+        Inventory inv = Bukkit.createInventory(null, Config.DROP_SELECTION_GUI_ROWS.getInt()*9, Config.DROP_SELECTION_GUI_NAME.getString());
 
         player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
 
@@ -161,16 +158,16 @@ public class DropMenu {
 
         ItemStack back = new ItemStack(Material.ARROW);
         ItemMeta backMeta = back.getItemMeta();
-        backMeta.setDisplayName(ChatColor.RED + "Powrót");
+        backMeta.setDisplayName(Config.DROP_SELECTION_GUI_BACK.getString());
         back.setItemMeta(backMeta);
-        inv.setItem(22, back);
+        inv.setItem(Config.DROP_SELECTION_GUI_BACK_SLOT.getInt(), back);
 
         fillEmptySlots(inv);
         player.openInventory(inv);
     }
 
     public void openLevelPreview(Player player, int level) {
-        Inventory inv = Bukkit.createInventory(null, 36, ChatColor.DARK_GRAY + "Podgląd: Poziom " + level);
+        Inventory inv = Bukkit.createInventory(null, Config.DROP_PREVIEW_GUI_ROWS.getInt()*9, Config.DROP_PREVIEW_GUI_NAME.getString().replaceAll("<level>", ""+level));
 
         player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
 
@@ -183,8 +180,7 @@ public class DropMenu {
             ItemMeta meta = icon.getItemMeta();
             meta.setDisplayName(getPolishName(icon));
 
-            List<String> lore = new ArrayList<>();
-            lore.add(ChatColor.GRAY + "Szansa bazowa: " + ChatColor.YELLOW + entry.chance() + "%");
+            List<String> lore = Config.DROP_PREVIEW_GUI_ITEMS_LORE.getStringList().stream().map(s -> s.replaceAll("<chance>", ""+entry.chance())).toList();
             meta.setLore(lore);
             icon.setItemMeta(meta);
 
@@ -193,9 +189,9 @@ public class DropMenu {
 
         ItemStack back = new ItemStack(Material.ARROW);
         ItemMeta backMeta = back.getItemMeta();
-        backMeta.setDisplayName(ChatColor.RED + "Powrót do menu");
+        backMeta.setDisplayName(Config.DROP_PREVIEW_GUI_BACK.getString());
         back.setItemMeta(backMeta);
-        inv.setItem(31, back);
+        inv.setItem(Config.DROP_PREVIEW_GUI_BACK_SLOT.getInt(), back);
 
         fillEmptySlots(inv);
         player.openInventory(inv);
@@ -205,8 +201,8 @@ public class DropMenu {
         SkyBlockUser user = SkyBlockUser.getSkyBlockUser(player.getUniqueId());
         if (user == null) return;
 
-        if (user.getDropLevel() >= 5) {
-            player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + "Osiągnąłeś już maksymalny poziom!");
+        if (user.getDropLevel() >= Config.DROP_LEVELS.getStringList().size()+1) {
+            player.sendMessage(Config.MESSAGES_DROP_MAX_LEVEL.getString());
             return;
         }
 
@@ -214,7 +210,7 @@ public class DropMenu {
 
         if (Main.getEconomy() != null) {
             if (!Main.getEconomy().has(player, cost)) {
-                player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + "Nie masz wystarczająco pieniędzy! Potrzebujesz: " + cost + "$");
+                player.sendMessage(Config.MESSAGES_NOT_ENOUGH_MONEY.getString());
                 return;
             }
             Main.getEconomy().withdrawPlayer(player, cost);
@@ -223,7 +219,7 @@ public class DropMenu {
         int newLevel = user.getDropLevel() + 1;
         user.setDropLevel(newLevel);
 
-        player.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.GREEN + "Pomyślnie ulepszono poziom dropu na: " + newLevel + " (-" + cost + "$)");
+        player.sendMessage(Config.MESSAGES_DROP_LEVELUP.getString().replaceAll("<newLevel>", ""+newLevel));
 
         player.playSound(player, Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 1.0F, 1.0F);
 
@@ -279,14 +275,7 @@ public class DropMenu {
     }
 
     private double getUpgradeCost(int currentLevel) {
-        switch (currentLevel) {
-            case 1: return 5000.0;
-            case 2: return 20000.0;
-            case 3: return 50000.0;
-            case 4: return 100000.0;
-            case 5: return 100000.0;
-            default: return 999999.0;
-        }
+        return Integer.parseInt(Config.DROP_LEVELS.getStringList().get(currentLevel));
     }
 
     private String getPolishName(ItemStack itemStack) {
@@ -297,17 +286,14 @@ public class DropMenu {
 
         Material mat = itemStack.getType();
 
-        switch (mat) {
-            case STONE: return ChatColor.GRAY + "Kamień";
-            case COBBLESTONE: return ChatColor.GRAY + "Bruk";
-            case COAL: return ChatColor.DARK_GRAY + "Węgiel";
-            case IRON_INGOT: return ChatColor.GRAY + "Sztabka Żelaza";
-            case COPPER_INGOT: return ChatColor.GOLD + "Sztabka Miedzi";
-            case GOLD_INGOT: return ChatColor.YELLOW + "Sztabka Złota";
-            case DIAMOND: return ChatColor.AQUA + "Diament";
-            case EMERALD: return ChatColor.GREEN + "Szmaragd";
-            case NETHERITE_SCRAP: return ChatColor.DARK_PURPLE + "Odłamek Netheritu";
-            default: return ChatColor.WHITE + mat.name();
+        for (String s : Config.DROP_POLISH_NAMES.getStringList()) {
+            String[] split = s.split(":");
+
+            if (split[0].equalsIgnoreCase(mat.toString())) {
+                return split[1];
+            }
         }
+
+        return ChatColor.WHITE + mat.name();
     }
 }

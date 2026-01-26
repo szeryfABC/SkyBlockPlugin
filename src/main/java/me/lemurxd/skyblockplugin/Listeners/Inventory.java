@@ -1,6 +1,7 @@
-package me.lemurxd.skyblockplugin.Listeners;
+package me.lemurxd.skyblockplugin.listeners;
 
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
+import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.gui.DropMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -18,7 +19,7 @@ public class Inventory implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         String title = ChatColor.stripColor(event.getView().getTitle());
 
-        if (title.startsWith("Zarządzanie Dropem")) {
+        if (title.startsWith(ChatColor.stripColor(Config.DROP_MAIN_GUI_NAME.getString()).replaceAll("<drop.level>", ""))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
 
@@ -37,13 +38,13 @@ public class Inventory implements Listener {
                 }
             }
         }
-        else if (title.equals("Wybierz poziom do podglądu")) {
+        else if (title.equals(ChatColor.stripColor(Config.DROP_SELECTION_GUI_NAME.getString()))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null) return;
             Player player = (Player) event.getWhoClicked();
 
             int slot = event.getSlot();
-            if (slot == 22) {
+            if (slot == Config.DROP_SELECTION_GUI_BACK_SLOT.getInt()) {
                 player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
                 dropMenu.open(player);
             }
@@ -53,12 +54,12 @@ public class Inventory implements Listener {
             }
         }
 
-        else if (title.startsWith("Podgląd: Poziom")) {
+        else if (title.startsWith(ChatColor.stripColor(Config.DROP_SELECTION_GUI_NAME.getString()).replaceAll("<level>", ""))) {
             event.setCancelled(true);
             if (event.getCurrentItem() == null) return;
             Player player = (Player) event.getWhoClicked();
 
-            if (event.getSlot() == 31) {
+            if (event.getSlot() == Config.DROP_SELECTION_GUI_BACK_SLOT.getInt()) {
                 player.playSound(player, Sound.ENTITY_WIND_CHARGE_THROW, 1.0F, 2.0F);
                 dropMenu.open(player);
             }

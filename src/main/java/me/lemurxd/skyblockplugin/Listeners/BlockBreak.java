@@ -1,4 +1,4 @@
-package me.lemurxd.skyblockplugin.Listeners;
+package me.lemurxd.skyblockplugin.listeners;
 
 import me.lemurxd.skyblockplugin.Main;
 import me.lemurxd.skyblockplugin.constructors.DropEntry;
@@ -38,7 +38,7 @@ public class BlockBreak implements Listener {
                 SafeGive.giv(StoneGenerator.getItemStack(), e.getPlayer());
             } else {
                 e.setCancelled(true);
-                e.getPlayer().sendMessage(Config.MAIN_PREFIX.getString() + "§cMusisz kucać, aby podnieść stoniarkę!");
+                e.getPlayer().sendMessage(Config.MESSAGES_GENERATOR_BREAK_SNEAK_INFO.getString());
                 return;
             }
         }

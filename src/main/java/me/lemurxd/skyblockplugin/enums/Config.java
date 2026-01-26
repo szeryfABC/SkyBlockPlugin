@@ -1,6 +1,5 @@
 package me.lemurxd.skyblockplugin.enums;
 
-import me.lemurxd.skyblockplugin.commands.OrbCommand;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
@@ -31,19 +30,64 @@ public enum Config {
     //Main
     MAIN_PREFIX("main.variables_prefix", "&a&lOF &f| ", true),
 
+    //Messages
+    MESSAGES_ONLY_PLAYERS("messages.only_for_players", "<prefix>&cTa komenda jest dostępna tylko dla graczy!", true),
+    MESSAGES_NOT_ENOUGH_MONEY("messages.not_enough_money", "<prefix>&cNie masz wystarczająco pieniędzy!"),
+    MESSAGES_ORB_COOLDOWN("messages.orb.coldown_message", "<prefix>&cMusisz odczekać jeszcze: <formattedTime>", true),
+    MESSAGES_ORB_GIVE("messages.org.given_message", "<prefix>&aOdebrałeś Magicznego Orba!", true),
+    MESSAGES_DROP_DATABASE_PROBLEM("messages.drop.database_problem", "<prefix>&cBłąd: Nie załadowano Twoich danych!", true),
+    MESSAGES_DROP_MAX_LEVEL("messages.drop.max_level", "<prefix>&cOsiągnąłeś już maksymalny poziom!", true),
+    MESSAGES_DROP_LEVELUP("messages.drop.", "<prefix>Ta komenda jest dostępna tylko dla graczy!", true),
+    MESSAGES_GENERATOR_BREAK_SNEAK_INFO("messages.generator.sneak_when_break", "<prefix>Musisz kucać, aby podnieść stoniarkę!", true),
+
+    //DROP
+    DROP_LEVELS("drop.levels_cost", Arrays.asList("5000", "20000", "50000", "100000")),
+
+    DROP_MAIN_GUI_ROWS("drop.gui.main.rows", 4),
+    DROP_MAIN_GUI_NAME("drop.gui.main.name", "&7Zarządzanie Dropem (Lvl: <drop.level>)", true),
+
+    DROP_PREVIEW_GUI_ROWS("drop.gui.preview.rows", 3),
+    DROP_PREVIEW_GUI_NAME("drop.gui.preview.name", "&8Podgląd: Poziom <level>", true),
+    DROP_PREVIEW_GUI_ITEMS_LORE("drop.gui.preview.items_lore", Arrays.asList("&7Szansa bazowa: <chance>%"), true),
+    DROP_PREVIEW_GUI_BACK("drop.gui.preview.back.name", "&cPowrót do menu", true),
+    DROP_PREVIEW_GUI_BACK_SLOT("drop.gui.preview.back.slot", 31),
+
+    DROP_SELECTION_GUI_ROWS("drop.gui.selection.rows", 1),
+    DROP_SELECTION_GUI_NAME("drop.gui.selection.name", "&8Wybierz poziom do podglądu", true),
+    DROP_SELECTION_GUI_BACK("drop.gui.selection.back.name", "&cPowrót do menu", true),
+    DROP_SELECTION_GUI_BACK_SLOT("drop.gui.selection.back.slot", 22),
+
+    DROP_POLISH_NAMES("drop.polish_names", Arrays.asList("STONE:&7Kamień", "COBBLESTONE:&7Bruk (Brak SilkTouch)", "COAL:&8Węgiel", "IRON_INGOT:&7Sztabka Żelaza", "COPPER_INGOT:&6Sztabka Miedzi", "GOLD_INGOT:&eSztabka Złota", "DIAMOND:&bDiament", "EMERALD:&aSzmaragd", "NETHERITE_SCRAP:&5Odłamek Netheritu"), true),
+
+
     //GAME SPAWN
-    SAFE_SPAWN_ENABLED("safe.spawn.enabled", false),
-    SAFE_SPAWN_WORLD("safe.spawn_world", "spawn"),
-    SAFE_SPAWN_X("safe.spawn_x", -43),
-    SAFE_SPAWN_Y("safe.spawn_y", 144),
-    SAFE_SPAWN_Z("safe.spawn_z", -24),
+    SAFE_SPAWN_ENABLED("safe_spawn.enabled", false),
+    SAFE_SPAWN_WORLD("safe.spawn.world", "spawn"),
+    SAFE_SPAWN_X("safe.spawn.x", -43),
+    SAFE_SPAWN_Y("safe.spawn.y", 144),
+    SAFE_SPAWN_Z("safe.spawn.z", -24),
+    SAFE_SPAWN_MINIMUM_Y("safe.spawn.minimum_y", -64),
     SAFE_SPAWN_FACING_X("safe.spawn.facing_x", 90),
     SAFE_SPAWN_FACING_Y("safe.spawn.facing_y", 0),
 
     //STONE-GENERATOR
-    GENERATOR_RECIPE_ENABLED("generator.recipe.enabled", true),
+    GENERATOR_RECIPE_ENABLED("generator.enabled", true),
     GENERATOR_RECIPE_SHAPE("generator.recipe.shape", Arrays.asList("AAA", "ABA", "AAA")),
     GENERATOR_RECIPE_INGREDIENTS("generator.recipe.ingredients", Arrays.asList("A: STONE", "B: DIAMOND_PICKAXE")),
+    GENERATOR_ITEM_MATERIAL("generator.item.material", "END_STONE"),
+    GENERATOR_ITEM_NAME("generator.item.name", "&6&l⭐ MAGICZNA STONIARKA ⭐", true),
+    GENERATOR_ITEM_LORE("generator.item.lore", Arrays.asList(
+            "&8&m-----------------------",
+            "&7To urządzenie generuje",
+            "&fNieskończone pokłady kamienia.",
+            "",
+            "&e&lINSTRUKCJA:",
+            " &8» &fPostaw na ziemi, aby zacząć.",
+            " &8» &fZniszcz kilofem, by odzyskać.",
+            "",
+            "&c&lUWAGA: &7Działa natychmiastowo!",
+            "&8&m-----------------------"
+    ), true),
     GENERATOR_TIME_TO_REGEN("generator.regen.time", 2),
 
     //ORB
@@ -228,29 +272,24 @@ public enum Config {
         config.set(path, def);
         return def;
     }
-
     private static boolean getBooleanOrSetDefault(ConfigurationSection config, String path, boolean def) {
         if (config.contains(path)) return config.getBoolean(path);
         config.set(path, def);
         return def;
     }
-
     private static String getStringOrSetDefault(ConfigurationSection config, String path, String def) {
         if (config.contains(path)) return config.getString(path);
         config.set(path, def);
         return def;
     }
-
     private static String getColoredStringOrSetDefault(ConfigurationSection config, String path, String def) {
         return ChatColor.translateAlternateColorCodes('&', getStringOrSetDefault(config, path, def.replace('§', '&')));
     }
-
     private static ArrayList<String> getStringListOrSetDefault(ConfigurationSection config, String path, List<String> def) {
         if(config.contains(path)) return new ArrayList<>(config.getStringList(path));
         config.set(path, def);
         return new ArrayList<>(def);
     }
-
     private static ArrayList<String> getColoredStringListOrSetDefault(ConfigurationSection config, String path, List<String> def) {
         ArrayList<String> list = getStringListOrSetDefault(config, path, def.stream().map(str -> str.replace('§', '&')).collect(Collectors.toCollection(ArrayList::new)));
         return list.stream().map(str -> ChatColor.translateAlternateColorCodes('&', str))

@@ -1,6 +1,5 @@
 package me.lemurxd.skyblockplugin;
 
-import me.lemurxd.skyblockplugin.Listeners.*;
 import me.lemurxd.skyblockplugin.commands.DropCommand;
 import me.lemurxd.skyblockplugin.commands.OrbCommand;
 import me.lemurxd.skyblockplugin.commands.SkyBlockPluginCommand;
@@ -10,6 +9,7 @@ import me.lemurxd.skyblockplugin.craftings.Generator;
 import me.lemurxd.skyblockplugin.database.SkyBlockUserDatabase;
 import me.lemurxd.skyblockplugin.database.StoneGeneratorDatabase;
 import me.lemurxd.skyblockplugin.enums.Config;
+import me.lemurxd.skyblockplugin.listeners.*;
 import me.lemurxd.skyblockplugin.tasks.DataBaseTask;
 import me.lemurxd.skyblockplugin.tasks.PlayerY;
 import net.milkbowl.vault.economy.Economy;
@@ -74,6 +74,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoin(), getInstance());
         Bukkit.getPluginManager().registerEvents(new Inventory(), getInstance());
         Bukkit.getPluginManager().registerEvents(new IslandDelete(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new StoneGeneratorProtection(), getInstance());
 
         new DataBaseTask().runTaskTimer(this, 12000L, 12000L);
 

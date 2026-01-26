@@ -16,7 +16,7 @@ public class DropCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + " Ta komenda jest dostępna tylko dla graczy!");
+            sender.sendMessage(Config.MESSAGES_ONLY_PLAYERS.getString());
             return true;
         }
 

@@ -1,5 +1,6 @@
 package me.lemurxd.skyblockplugin.constructors;
 
+import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.utils.NBTUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,23 +58,13 @@ public class StoneGenerator {
     }
 
     public static ItemStack getItemStack() {
-        ItemStack stoniarka = new ItemStack(Material.END_STONE);
+        ItemStack stoniarka = new ItemStack(Material.getMaterial(Config.GENERATOR_ITEM_MATERIAL.getString()));
         ItemMeta meta = stoniarka.getItemMeta();
 
         if (meta != null) {
-            meta.setDisplayName("§6§l⭐ MAGICZNA STONIARKA ⭐");
+            meta.setDisplayName(Config.GENERATOR_ITEM_NAME.getString());
 
-            List<String> lore = new ArrayList<>();
-            lore.add("§8§m-----------------------");
-            lore.add("§7To urządzenie generuje");
-            lore.add("§fNieskończone pokłady kamienia.");
-            lore.add("");
-            lore.add("§e§lINSTRUKCJA:");
-            lore.add(" §8» §fPostaw na ziemi, aby zacząć.");
-            lore.add(" §8» §fZniszcz kilofem, by odzyskać.");
-            lore.add("");
-            lore.add("§c§lUWAGA: §7Działa natychmiastowo!");
-            lore.add("§8§m-----------------------");
+            List<String> lore = Config.GENERATOR_ITEM_LORE.getStringList();
             meta.setLore(lore);
 
             meta.addEnchant(org.bukkit.enchantments.Enchantment.LUCK_OF_THE_SEA, 1, true);

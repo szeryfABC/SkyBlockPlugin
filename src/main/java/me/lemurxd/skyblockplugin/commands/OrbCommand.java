@@ -17,7 +17,7 @@ public class OrbCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(Config.MAIN_PREFIX.getString() + ChatColor.RED + " Ta komenda jest dostępna tylko dla graczy!");
+            sender.sendMessage(Config.MESSAGES_ONLY_PLAYERS.getString());
             return true;
         }
 
@@ -35,7 +35,7 @@ public class OrbCommand implements CommandExecutor {
 
             String formattedTime = BasicUtils.formatTime(timeLeftMillis);
 
-            player.sendMessage(Config.MAIN_PREFIX.getString() + " §cMusisz odczekać jeszcze: " + formattedTime);
+            player.sendMessage(Config.MESSAGES_ORB_COOLDOWN.getString().replaceAll("<formattedTime>", formattedTime));
             return true;
         }
 
@@ -45,7 +45,7 @@ public class OrbCommand implements CommandExecutor {
 
         player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1, 1);
 
-        player.sendMessage(Config.MAIN_PREFIX.getString() + " §aOdebrałeś swoją nagrodę!");
+        player.sendMessage(Config.MESSAGES_ORB_GIVE.getString());
 
         return true;
     }

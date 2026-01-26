@@ -1,4 +1,4 @@
-package me.lemurxd.skyblockplugin.Listeners;
+package me.lemurxd.skyblockplugin.listeners;
 
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import org.bukkit.Bukkit;

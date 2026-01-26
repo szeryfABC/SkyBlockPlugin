@@ -33,8 +33,8 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
         if (args.length < 2) {
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cPoprawne użycie:");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give stoniarka [gracz]");
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give orb [gracz]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp drop set <gracz> <poziom>");
-            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb give <gracz>");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb reset <gracz>");
             return true;
         }

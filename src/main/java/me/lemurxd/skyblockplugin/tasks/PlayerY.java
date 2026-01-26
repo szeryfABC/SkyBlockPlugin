@@ -12,7 +12,7 @@ public class PlayerY {
         Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
             if (!Config.SAFE_SPAWN_ENABLED.getBoolean()) return;
             for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getWorld().equals(Config.SAFE_SPAWN_WORLD.getString())) {
+                if (p.getWorld().equals(Config.SAFE_SPAWN_WORLD.getString()) && p.getLocation().getY() <= Config.SAFE_SPAWN_Y.getInt()) {
                     p.teleport(new Location(Bukkit.getWorld(Config.SAFE_SPAWN_WORLD.getString()), Config.SAFE_SPAWN_X.getInt(), Config.SAFE_SPAWN_Y.getInt(), Config.SAFE_SPAWN_Z.getInt(), Config.SAFE_SPAWN_FACING_X.getInt(), Config.SAFE_SPAWN_FACING_Y.getInt()));
                 }
             }
