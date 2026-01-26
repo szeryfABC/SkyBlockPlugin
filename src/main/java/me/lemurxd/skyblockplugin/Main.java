@@ -2,6 +2,7 @@ package me.lemurxd.skyblockplugin;
 
 import me.lemurxd.skyblockplugin.Listeners.*;
 import me.lemurxd.skyblockplugin.commands.DropCommand;
+import me.lemurxd.skyblockplugin.commands.OrbCommand;
 import me.lemurxd.skyblockplugin.commands.SkyBlockPluginCommand;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
@@ -77,7 +78,8 @@ public class Main extends JavaPlugin {
         new DataBaseTask().runTaskTimer(this, 12000L, 12000L);
 
         getCommand("skyblockplugin").setExecutor(new SkyBlockPluginCommand());
-        getCommand("Drop").setExecutor(new DropCommand());
+        getCommand("drop").setExecutor(new DropCommand());
+        getCommand("orb").setExecutor(new OrbCommand());
 
         setupEconomy();
     }

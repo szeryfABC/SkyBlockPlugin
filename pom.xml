@@ -6,7 +6,7 @@
 
     <groupId>me.lemurxd.skyblockplugin</groupId>
     <artifactId>SkyBlockPlugin</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -32,6 +32,11 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>nexus</id>
+            <name>Lumine Releases</name>
+            <url>https://mvn.lumine.io/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -60,6 +65,13 @@
             <version>1.7</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.lumine</groupId>
+            <artifactId>Mythic-Dist</artifactId>
+            <version>5.11.1</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

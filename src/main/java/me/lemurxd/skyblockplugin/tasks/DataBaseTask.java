@@ -27,7 +27,8 @@ public class DataBaseTask extends BukkitRunnable {
             usersToSave.add(new UserSnapshot(
                     user.getPlayerUniqueId().toString(),
                     user.getDropLevel(),
-                    serializedDrops
+                    serializedDrops,
+                    user.getLastOrbUsage()
             ));
 
             if (player == null) {
@@ -50,10 +51,8 @@ public class DataBaseTask extends BukkitRunnable {
     }
 
     private void saveUsersAsync(List<UserSnapshot> users) {
-        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data) VALUES (?, ?, ?)";
         try {
             Main.getUserDatabase().saveUsersBatch(users);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,5 +62,5 @@ public class DataBaseTask extends BukkitRunnable {
         Main.getDatabase().saveGenerators(generators);
     }
 
-    public record UserSnapshot(String uuid, int level, String data) {}
+    public record UserSnapshot(String uuid, int level, String data, long lastOrbUsage) {}
 }

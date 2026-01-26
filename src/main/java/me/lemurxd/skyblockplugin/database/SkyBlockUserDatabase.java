@@ -22,7 +22,8 @@ public class SkyBlockUserDatabase {
         String sql = "CREATE TABLE IF NOT EXISTS skyblock_users (" +
                 "uuid VARCHAR(36) PRIMARY KEY, " +
                 "drop_level INTEGER NOT NULL, " +
-                "drops_data TEXT NOT NULL" +
+                "drops_data TEXT NOT NULL," +
+                "last_orb_usage BIGINT DEFAULT 0" +
                 ");";
 
         try (Statement stmt = connection.createStatement()) {
@@ -33,7 +34,7 @@ public class SkyBlockUserDatabase {
     }
 
     public void saveUser(SkyBlockUser user) {
-        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data) VALUES (?, ?, ?)";
+        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data, last_orb_usage) VALUES (?, ?, ?, ?)";
 
         String serializedDrops = DropSerializer.serialize(user.getDrops());
 
@@ -41,6 +42,7 @@ public class SkyBlockUserDatabase {
             stmt.setString(1, user.getPlayerUniqueId().toString());
             stmt.setInt(2, user.getDropLevel());
             stmt.setString(3, serializedDrops);
+            stmt.setLong(4, user.getLastOrbUsage());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -58,10 +60,11 @@ public class SkyBlockUserDatabase {
                 if (rs.next()) {
                     int level = rs.getInt("drop_level");
                     String dropsData = rs.getString("drops_data");
+                    long lastOrbUsage = rs.getLong("last_orb_usage");
 
                     List<DropEntry> drops = DropSerializer.deserialize(dropsData);
 
-                    return new SkyBlockUser(uuid, drops, level);
+                    return new SkyBlockUser(uuid, drops, level, lastOrbUsage);
                 }
             }
         } catch (SQLException e) {
@@ -71,7 +74,7 @@ public class SkyBlockUserDatabase {
     }
 
     public void saveUsersBatch(List<DataBaseTask.UserSnapshot> snapshots) {
-        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data) VALUES (?, ?, ?)";
+        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data, last_orb_usage) VALUES (?, ?, ?, ?)";
 
         try {
             connection.setAutoCommit(false);
@@ -81,6 +84,7 @@ public class SkyBlockUserDatabase {
                     stmt.setString(1, snap.uuid());
                     stmt.setInt(2, snap.level());
                     stmt.setString(3, snap.data());
+                    stmt.setLong(4, snap.lastOrbUsage());
                     stmt.addBatch();
                 }
 

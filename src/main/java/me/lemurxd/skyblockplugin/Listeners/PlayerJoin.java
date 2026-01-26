@@ -33,7 +33,7 @@ public class PlayerJoin implements Listener {
             if (loadedUser != null) {
                 SkyBlockUser.getSkyBlockUsers().add(loadedUser);
             } else {
-                SkyBlockUser.createSkyBlockUser(e.getPlayer().getUniqueId(), SkyBlockUser.getDropsForLevel(1), 1);
+                SkyBlockUser.createSkyBlockUser(e.getPlayer().getUniqueId(), SkyBlockUser.getDropsForLevel(1), 1, 0);
             }
         }
         if (BentoBox.getInstance().getIslandsManager().hasIsland(Bukkit.getWorld("bskyblock_world"), User.getInstance(e.getPlayer().getUniqueId()))) {

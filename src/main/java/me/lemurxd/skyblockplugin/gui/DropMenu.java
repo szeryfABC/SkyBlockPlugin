@@ -1,9 +1,11 @@
 package me.lemurxd.skyblockplugin.gui;
 
+import io.lumine.mythic.bukkit.MythicBukkit;
 import me.lemurxd.skyblockplugin.Main;
 import me.lemurxd.skyblockplugin.constructors.DropEntry;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.enums.Config;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -47,7 +49,7 @@ public class DropMenu {
             ItemStack icon = entry.dropItem().clone();
             ItemMeta meta = icon.getItemMeta();
 
-            String polishName = getPolishName(icon.getType());
+            String polishName = getPolishName(icon);
             if (icon.getType() == Material.STONE && !hasSilkTouch) {
                 polishName = ChatColor.GRAY + "Bruk (Brak SilkTouch)";
                 icon.setType(Material.COBBLESTONE);
@@ -179,7 +181,7 @@ public class DropMenu {
             DropEntry entry = drops.get(i);
             ItemStack icon = entry.dropItem().clone();
             ItemMeta meta = icon.getItemMeta();
-            meta.setDisplayName(getPolishName(icon.getType()));
+            meta.setDisplayName(getPolishName(icon));
 
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "Szansa bazowa: " + ChatColor.YELLOW + entry.chance() + "%");
@@ -287,7 +289,14 @@ public class DropMenu {
         }
     }
 
-    private String getPolishName(Material mat) {
+    private String getPolishName(ItemStack itemStack) {
+
+        if (MythicBukkit.inst().getItemManager().isMythicItem(itemStack)) {
+            return LegacyComponentSerializer.legacySection().serialize(itemStack.getItemMeta().customName());
+        }
+
+        Material mat = itemStack.getType();
+
         switch (mat) {
             case STONE: return ChatColor.GRAY + "Kamień";
             case COBBLESTONE: return ChatColor.GRAY + "Bruk";

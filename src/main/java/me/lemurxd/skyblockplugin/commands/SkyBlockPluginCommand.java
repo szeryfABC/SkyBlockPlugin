@@ -34,9 +34,11 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cPoprawne użycie:");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give stoniarka [gracz]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp drop set <gracz> <poziom>");
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb give <gracz>");
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb reset <gracz>");
             return true;
         }
-        
+
         if (args[0].equalsIgnoreCase("give")) {
 
             if (args[1].equalsIgnoreCase("stoniarka")) {
@@ -60,6 +62,28 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie dano stoniarkę graczowi " + target.getName());
                 return true;
             }
+
+            if (args[1].equalsIgnoreCase("orb")) {
+                Player target;
+                if (args.length == 3) {
+                    target = Bukkit.getPlayer(args[2]);
+                    if (target == null) {
+                        sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cGracz " + args[2] + " jest offline!");
+                        return true;
+                    }
+                } else {
+                    if (!(sender instanceof Player)) {
+                        sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cKonsola musi podać nick gracza! /sbp orb give <nick>");
+                        return true;
+                    }
+                    target = (Player) sender;
+                }
+
+                SafeGive.giv(io.lumine.mythic.bukkit.MythicBukkit.inst().getItemManager().getItemStack(Config.ORB_ITEM_NAME.getString()), target);
+                sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie dano Orba graczowi " + target.getName());
+                return true;
+            }
+
         }
 
         else if (args[0].equalsIgnoreCase("drop")) {
@@ -109,6 +133,49 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             }
         }
 
+        else if (args[0].equalsIgnoreCase("orb")) {
+
+            if (args[1].equalsIgnoreCase("reset")) {
+                if (args.length < 3) {
+                    sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cPodaj nick gracza: /sbp orb reset <nick>");
+                    return true;
+                }
+
+                String targetName = args[2];
+                Player target = Bukkit.getPlayer(targetName);
+
+                if (target != null) {
+                    SkyBlockUser user = SkyBlockUser.getSkyBlockUser(target.getUniqueId());
+                    if (user != null) {
+                        user.setLastOrbUsage(0);
+                        sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aZresetowano czas odnowienia orba dla gracza " + target.getName() + " (Online).");
+                    } else {
+                        sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cBłąd: Nie znaleziono danych użytkownika w pamięci!");
+                    }
+                }
+                else {
+                    sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7Gracz offline. Resetuję czas w bazie...");
+
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(targetName);
+                    UUID targetUUID = offlinePlayer.getUniqueId();
+
+                    Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                        SkyBlockUser user = Main.getUserDatabase().loadUser(targetUUID);
+
+                        if (user != null) {
+                            user.setLastOrbUsage(0);
+                            Main.getUserDatabase().saveUser(user);
+
+                            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie zresetowano czas orba dla gracza " + targetName + " w bazie danych.");
+                        } else {
+                            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cGracz " + targetName + " nie istnieje w bazie danych pluginu.");
+                        }
+                    });
+                }
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -120,18 +187,19 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             completions.add("give");
             completions.add("drop");
-        }
-        else if (args.length == 2) {
+            completions.add("orb");
+        } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("give")) {
                 completions.add("stoniarka");
+                completions.add("orb");
             } else if (args[0].equalsIgnoreCase("drop")) {
                 completions.add("set");
+            } else if (args[0].equalsIgnoreCase("orb")) {
+                completions.add("reset");
             }
-        }
-        else if (args.length == 3) {
+        } else if (args.length == 3) {
             return null;
-        }
-        else if (args.length == 4) {
+        } else if (args.length == 4) {
             if (args[0].equalsIgnoreCase("drop") && args[1].equalsIgnoreCase("set")) {
                 completions.addAll(Arrays.asList("1", "2", "3", "4", "5"));
             }

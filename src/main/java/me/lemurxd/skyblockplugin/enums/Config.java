@@ -1,5 +1,6 @@
 package me.lemurxd.skyblockplugin.enums;
 
+import me.lemurxd.skyblockplugin.commands.OrbCommand;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.ChatColor;
@@ -43,7 +44,11 @@ public enum Config {
     GENERATOR_RECIPE_ENABLED("generator.recipe.enabled", true),
     GENERATOR_RECIPE_SHAPE("generator.recipe.shape", Arrays.asList("AAA", "ABA", "AAA")),
     GENERATOR_RECIPE_INGREDIENTS("generator.recipe.ingredients", Arrays.asList("A: STONE", "B: DIAMOND_PICKAXE")),
-    GENERATOR_TIME_TO_REGEN("generator.regen.time", 2)
+    GENERATOR_TIME_TO_REGEN("generator.regen.time", 2),
+
+    //ORB
+    ORB_COOLDOWN("orb.cooldown", 48),
+    ORB_ITEM_NAME("orb.mythicitem", "magicznyOrb")
 
     ;
 
