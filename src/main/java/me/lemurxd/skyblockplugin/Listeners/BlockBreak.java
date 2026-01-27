@@ -31,7 +31,7 @@ public class BlockBreak implements Listener {
 
         if (StoneGenerator.isStoneGenerator(blockLoc)) {
             if (e.getPlayer().isSneaking()) {
-                Optional<Island> island = BentoBox.getInstance().getIslandsManager().getIslandAt(blockLoc);
+                String island = BentoBox.getInstance().getIslandsManager().getIslandAt(blockLoc).get().getUniqueId();
                 StoneGenerator.remove(island, blockLoc);
 
                 e.setDropItems(false);

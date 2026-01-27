@@ -19,15 +19,7 @@ public class IslandDelete  implements Listener{
 
         String islandId = island.getUniqueId().toString();
 
-        Optional<Island> key = Optional.of(island);
-
-        if (StoneGenerator.getMap().containsKey(key)) {
-            StoneGenerator.getMap().remove(key);
-        } else {
-            StoneGenerator.getMap().keySet().removeIf(optIsland ->
-                    optIsland.isPresent() && optIsland.get().getUniqueId().equals(island.getUniqueId())
-            );
-        }
+        StoneGenerator.getMap().keySet().removeIf(optIsland -> optIsland.equals(islandId));
 
         Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             Main.getDatabase().deleteGeneratorsForIsland(islandId);

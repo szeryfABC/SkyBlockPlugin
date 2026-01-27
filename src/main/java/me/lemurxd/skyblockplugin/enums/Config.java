@@ -42,6 +42,8 @@ public enum Config {
 
     //DROP
     DROP_LEVELS("drop.levels_cost", Arrays.asList("5000", "20000", "50000", "100000")),
+    DROP_DROPS("drop.drop_config", Arrays.asList("STONE:100.0<n>COAL:1.0<n>COPPER_INGOT:0.8", "STONE:1000<n>COAL:2<n>IRON_INGOT:0.5<n>COPPER_INGOT:1.5<n>GOLD_INGOT:0.3<n>mitycznyDiament:0.001", "STONE:100.0<n>COAL:6.0<n>IRON_INGOT:2.5<n>COPPER_INGOT:5.0<n>GOLD_INGOT:1.0<n>DIAMOND:0.3<n>EMERALD:0.1<n>mitycznyDiament:0.01", "STONE:100.0<n>COAL:10.0<n>IRON_INGOT:5.0<n>COPPER_INGOT:8.5<n>GOLD_INGOT:1.0<n>DIAMOND:0.3<n>EMERALD:0.1<n>mitycznyDiament:0.01")),
+
 
     DROP_MAIN_GUI_ROWS("drop.gui.main.rows", 4),
     DROP_MAIN_GUI_NAME("drop.gui.main.name", "&7Zarządzanie Dropem (Lvl: <drop.level>)", true),
@@ -88,6 +90,8 @@ public enum Config {
             "&c&lUWAGA: &7Działa natychmiastowo!",
             "&8&m-----------------------"
     ), true),
+    GENERAOTOR_ITEM_NBT_KEY("generator.item.nbt.key", "SkyBlockPlugin"),
+    GENERAOTOR_ITEM_NBT_VALUE("generator.item.nbt.value", "STONE_GENERATOR"),
     GENERATOR_TIME_TO_REGEN("generator.regen.time", 2),
 
     //ORB

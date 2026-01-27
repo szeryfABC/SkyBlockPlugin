@@ -36,7 +36,7 @@ public class DataBaseTask extends BukkitRunnable {
             }
         }
 
-        Map<Optional<Island>, List<StoneGenerator>> generatorsSnapshot = new HashMap<>(StoneGenerator.getMap());
+        Map<String, List<StoneGenerator>> generatorsSnapshot = new HashMap<>(StoneGenerator.getMap());
 
         Main.getInstance().getLogger().info("[AutoSave] Przygotowano do zapisu: " + usersToSave.size() + " graczy.");
 
@@ -58,7 +58,7 @@ public class DataBaseTask extends BukkitRunnable {
         }
     }
 
-    private void saveGeneratorsAsync(Map<Optional<Island>, List<StoneGenerator>> generators) {
+    private void saveGeneratorsAsync(Map<String, List<StoneGenerator>> generators) {
         Main.getDatabase().saveGenerators(generators);
     }
 

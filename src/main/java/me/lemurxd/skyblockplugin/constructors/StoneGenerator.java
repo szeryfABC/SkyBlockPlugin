@@ -13,27 +13,27 @@ import java.util.*;
 
 public class StoneGenerator {
 
-    private static HashMap<Optional<Island>, List<StoneGenerator>> generatorMap = new HashMap<>();
+    private static HashMap<String, List<StoneGenerator>> generatorMap = new HashMap<>();
 
     private Location location;
-    private Optional<Island> island;
+    private String islandUuid;
     
-    public StoneGenerator(Optional<Island> island, Location location) {
-        this.island = island;
+    public StoneGenerator(String islandUuid, Location location) {
+        this.islandUuid = islandUuid;
         this.location = location;
     }
 
-    public static void create(Optional<Island> island, Location location) {
-        StoneGenerator newGenerator = new StoneGenerator(island, location);
+    public static void create(String islandUuid, Location location) {
+        StoneGenerator newGenerator = new StoneGenerator(islandUuid, location);
 
-        List<StoneGenerator> generators = generatorMap.computeIfAbsent(island, k -> new ArrayList<>());
+        List<StoneGenerator> generators = generatorMap.computeIfAbsent(islandUuid, k -> new ArrayList<>());
 
         generators.removeIf(gen -> gen.getLocation().equals(location));
 
         generators.add(newGenerator);
     }
 
-    public static void remove(Optional<Island> island, Location location) {
+    public static void remove(String island, Location location) {
         List<StoneGenerator> list = generatorMap.get(island);
 
         if (list != null) {
@@ -45,15 +45,15 @@ public class StoneGenerator {
         }
     }
     
-    public Optional<Island> getIsland() {
-        return island;
+    public String getIsland() {
+        return islandUuid;
     }
 
     public Location getLocation() {
         return location;
     }
 
-    public static HashMap<Optional<Island>, List<StoneGenerator>> getMap() {
+    public static HashMap<String, List<StoneGenerator>> getMap() {
         return generatorMap;
     }
 
@@ -75,20 +75,20 @@ public class StoneGenerator {
             stoniarka.setItemMeta(meta);
         }
 
-        NBTUtil.setString(stoniarka, "SkyBlockPlugin", "STONE_GENERATOR");
+        NBTUtil.setString(stoniarka, Config.GENERAOTOR_ITEM_NBT_KEY.getString(), Config.GENERAOTOR_ITEM_NBT_KEY.getString());
 
         return stoniarka;
     }
 
     public static boolean isStoneGeneratorItem(ItemStack item) {
-        if (NBTUtil.hasTag(item, "SkyBlockPlugin") && NBTUtil.getString(item, "SkyBlockPlugin").equals("STONE_GENERATOR")) {
+        if (NBTUtil.hasTag(item, Config.GENERAOTOR_ITEM_NBT_KEY.getString()) && NBTUtil.getString(item, Config.GENERAOTOR_ITEM_NBT_KEY.getString()).equals(Config.GENERAOTOR_ITEM_NBT_KEY.getString())) {
             return true;
         }
         return false;
     }
 
     public static boolean isStoneGenerator(Location location) {
-        Optional<Island> island = BentoBox.getInstance().getIslandsManager().getIslandAt(location);
+        String island = BentoBox.getInstance().getIslandsManager().getIslandAt(location).get().getUniqueId();
 
         List<StoneGenerator> list = generatorMap.get(island);
 

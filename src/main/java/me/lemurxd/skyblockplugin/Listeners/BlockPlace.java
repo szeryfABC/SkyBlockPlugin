@@ -12,6 +12,7 @@ import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.database.objects.Island;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class BlockPlace implements Listener {
 
@@ -19,7 +20,7 @@ public class BlockPlace implements Listener {
     public void onPlace(BlockPlaceEvent e) {
         if (e.isCancelled()) return;
 
-        Optional<Island> island = BentoBox.getInstance().getIslandsManager().getIslandAt(e.getBlockPlaced().getLocation());
+        String island = BentoBox.getInstance().getIslandsManager().getIslandAt(e.getBlockPlaced().getLocation()).get().getUniqueId();
 
         if (StoneGenerator.isStoneGeneratorItem(e.getItemInHand())) {
 
@@ -27,8 +28,6 @@ public class BlockPlace implements Listener {
                 e.setCancelled(true);
                 return;
             }
-
-            StoneGenerator.create(island, e.getBlockPlaced().getLocation());
 
             Location location = e.getBlockPlaced().getLocation().add(0, 1,0);
             StoneGenerator.create(island, e.getBlockPlaced().getLocation());
