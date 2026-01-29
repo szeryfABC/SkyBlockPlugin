@@ -28,7 +28,8 @@ public class DataBaseTask extends BukkitRunnable {
                     user.getPlayerUniqueId().toString(),
                     user.getDropLevel(),
                     serializedDrops,
-                    user.getLastOrbUsage()
+                    user.getLastOrbUsage(),
+                    user.isMagnetEnabled()
             ));
 
             if (player == null) {
@@ -39,7 +40,6 @@ public class DataBaseTask extends BukkitRunnable {
         Map<String, List<StoneGenerator>> generatorsSnapshot = new HashMap<>(StoneGenerator.getMap());
 
         Main.getInstance().getLogger().info("[AutoSave] Przygotowano do zapisu: " + usersToSave.size() + " graczy.");
-
 
         new BukkitRunnable() {
             @Override
@@ -62,5 +62,5 @@ public class DataBaseTask extends BukkitRunnable {
         Main.getDatabase().saveGenerators(generators);
     }
 
-    public record UserSnapshot(String uuid, int level, String data, long lastOrbUsage) {}
+    public record UserSnapshot(String uuid, int level, String data, long lastOrbUsage, boolean magnetEnabled) {}
 }

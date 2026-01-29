@@ -88,13 +88,25 @@ public class StoneGenerator {
     }
 
     public static boolean isStoneGenerator(Location location) {
-        String island = BentoBox.getInstance().getIslandsManager().getIslandAt(location).get().getUniqueId();
+        var islandOpt = BentoBox.getInstance().getIslandsManager().getIslandAt(location);
 
-        List<StoneGenerator> list = generatorMap.get(island);
+        if (islandOpt.isEmpty()) {
+            return false;
+        }
 
-        if (list == null) return false;
+        String islandId = islandOpt.get().getUniqueId();
 
-        return list.stream().anyMatch(gen -> gen.getLocation().equals(location));
+        List<StoneGenerator> list = generatorMap.get(islandId);
+
+        if (list == null || list.isEmpty()) return false;
+
+        for (StoneGenerator gen : list) {
+            if (gen.getLocation().equals(location)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

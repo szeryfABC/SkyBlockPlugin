@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,12 +31,21 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            File configFile = new File(Main.getInstance().getDataFolder(), "SkyBlockConfig.yml");
+            Config.load(configFile);
+
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aKonfiguracja została pomyślnie przeładowana!");
+            return true;
+        }
+
         if (args.length < 2) {
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cPoprawne użycie:");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give stoniarka [gracz]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give orb [gracz]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp drop set <gracz> <poziom>");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb reset <gracz>");
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp reload");
             return true;
         }
 
@@ -84,9 +94,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
 
-        }
-
-        else if (args[0].equalsIgnoreCase("drop")) {
+        } else if (args[0].equalsIgnoreCase("drop")) {
             if (args.length >= 4 && args[1].equalsIgnoreCase("set")) {
                 String targetName = args[2];
                 int level;
@@ -131,9 +139,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                 }
                 return true;
             }
-        }
-
-        else if (args[0].equalsIgnoreCase("orb")) {
+        } else if (args[0].equalsIgnoreCase("orb")) {
 
             if (args[1].equalsIgnoreCase("reset")) {
                 if (args.length < 3) {
@@ -152,8 +158,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                     } else {
                         sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cBłąd: Nie znaleziono danych użytkownika w pamięci!");
                     }
-                }
-                else {
+                } else {
                     sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7Gracz offline. Resetuję czas w bazie...");
 
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(targetName);
@@ -188,6 +193,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             completions.add("give");
             completions.add("drop");
             completions.add("orb");
+            completions.add("reload");
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("give")) {
                 completions.add("stoniarka");

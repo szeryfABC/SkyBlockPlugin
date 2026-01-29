@@ -22,8 +22,9 @@ public class SkyBlockUserDatabase {
         String sql = "CREATE TABLE IF NOT EXISTS skyblock_users (" +
                 "uuid VARCHAR(36) PRIMARY KEY, " +
                 "drop_level INTEGER NOT NULL, " +
-                "drops_data TEXT NOT NULL," +
-                "last_orb_usage BIGINT DEFAULT 0" +
+                "drops_data TEXT NOT NULL, " +
+                "last_orb_usage BIGINT DEFAULT 0, " +
+                "magnet_enabled BOOLEAN DEFAULT 0" +
                 ");";
 
         try (Statement stmt = connection.createStatement()) {
@@ -34,7 +35,7 @@ public class SkyBlockUserDatabase {
     }
 
     public void saveUser(SkyBlockUser user) {
-        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data, last_orb_usage) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data, last_orb_usage, magnet_enabled) VALUES (?, ?, ?, ?, ?)";
 
         String serializedDrops = DropSerializer.serialize(user.getDrops());
 
@@ -43,6 +44,7 @@ public class SkyBlockUserDatabase {
             stmt.setInt(2, user.getDropLevel());
             stmt.setString(3, serializedDrops);
             stmt.setLong(4, user.getLastOrbUsage());
+            stmt.setBoolean(5, user.isMagnetEnabled());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -61,10 +63,11 @@ public class SkyBlockUserDatabase {
                     int level = rs.getInt("drop_level");
                     String dropsData = rs.getString("drops_data");
                     long lastOrbUsage = rs.getLong("last_orb_usage");
+                    boolean magnetEnabled = rs.getBoolean("magnet_enabled");
 
                     List<DropEntry> drops = DropSerializer.deserialize(dropsData);
 
-                    return new SkyBlockUser(uuid, drops, level, lastOrbUsage);
+                    return new SkyBlockUser(uuid, drops, level, lastOrbUsage, magnetEnabled);
                 }
             }
         } catch (SQLException e) {
@@ -74,7 +77,7 @@ public class SkyBlockUserDatabase {
     }
 
     public void saveUsersBatch(List<DataBaseTask.UserSnapshot> snapshots) {
-        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data, last_orb_usage) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT OR REPLACE INTO skyblock_users (uuid, drop_level, drops_data, last_orb_usage, magnet_enabled) VALUES (?, ?, ?, ?, ?)";
 
         try {
             connection.setAutoCommit(false);
@@ -85,6 +88,7 @@ public class SkyBlockUserDatabase {
                     stmt.setInt(2, snap.level());
                     stmt.setString(3, snap.data());
                     stmt.setLong(4, snap.lastOrbUsage());
+                    stmt.setBoolean(5, snap.magnetEnabled());
                     stmt.addBatch();
                 }
 
@@ -101,5 +105,4 @@ public class SkyBlockUserDatabase {
             e.printStackTrace();
         }
     }
-
 }

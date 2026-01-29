@@ -6,7 +6,7 @@
 
     <groupId>me.lemurxd.skyblockplugin</groupId>
     <artifactId>SkyBlockPlugin</artifactId>
-    <version>0.2</version>
+    <version>0.5</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -37,6 +37,10 @@
             <id>nexus</id>
             <name>Lumine Releases</name>
             <url>https://mvn.lumine.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>neetgames</id>
+            <url>https://nexus.neetgames.com/repository/maven-releases/</url>
         </repository>
     </repositories>
 
@@ -71,7 +75,26 @@
             <version>5.11.1</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.gmail.nossr50.mcMMO</groupId>
+            <artifactId>mcMMO</artifactId>
+            <version>2.2.049</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sk89q.worldguard</groupId>
+                    <artifactId>worldguard-legacy</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sk89q.worldedit</groupId>
+                    <artifactId>worldedit-bukkit</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sk89q.worldedit</groupId>
+                    <artifactId>worldedit-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 </project>

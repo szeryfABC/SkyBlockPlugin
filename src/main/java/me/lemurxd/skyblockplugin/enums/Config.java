@@ -37,16 +37,21 @@ public enum Config {
     MESSAGES_ORB_GIVE("messages.org.given_message", "<prefix>&aOdebrałeś Magicznego Orba!", true),
     MESSAGES_DROP_DATABASE_PROBLEM("messages.drop.database_problem", "<prefix>&cBłąd: Nie załadowano Twoich danych!", true),
     MESSAGES_DROP_MAX_LEVEL("messages.drop.max_level", "<prefix>&cOsiągnąłeś już maksymalny poziom!", true),
-    MESSAGES_DROP_LEVELUP("messages.drop.", "<prefix>Ta komenda jest dostępna tylko dla graczy!", true),
+    MESSAGES_DROP_LEVELUP("messages.drop.levelup", "<prefix>Ulepszyłeś drop na <level> poziom!", true),
     MESSAGES_GENERATOR_BREAK_SNEAK_INFO("messages.generator.sneak_when_break", "<prefix>Musisz kucać, aby podnieść stoniarkę!", true),
 
     //DROP
     DROP_LEVELS("drop.levels_cost", Arrays.asList("5000", "20000", "50000", "100000")),
-    DROP_DROPS("drop.drop_config", Arrays.asList("STONE:100.0<n>COAL:1.0<n>COPPER_INGOT:0.8", "STONE:1000<n>COAL:2<n>IRON_INGOT:0.5<n>COPPER_INGOT:1.5<n>GOLD_INGOT:0.3<n>mitycznyDiament:0.001", "STONE:100.0<n>COAL:6.0<n>IRON_INGOT:2.5<n>COPPER_INGOT:5.0<n>GOLD_INGOT:1.0<n>DIAMOND:0.3<n>EMERALD:0.1<n>mitycznyDiament:0.01", "STONE:100.0<n>COAL:10.0<n>IRON_INGOT:5.0<n>COPPER_INGOT:8.5<n>GOLD_INGOT:1.0<n>DIAMOND:0.3<n>EMERALD:0.1<n>mitycznyDiament:0.01")),
+    DROP_DROPS("drop.drop_config", Arrays.asList("STONE:100.0<n>COAL:1.0<n>COPPER_INGOT:0.8", "STONE:1000<n>COAL:2<n>IRON_INGOT:0.5<n>COPPER_INGOT:1.5<n>GOLD_INGOT:0.3<n>mitycznyDiament:0.001", "STONE:100.0<n>COAL:6.0<n>IRON_INGOT:2.5<n>COPPER_INGOT:5.0<n>GOLD_INGOT:1.0<n>DIAMOND:0.3<n>EMERALD:0.1<n>mitycznyDiament:0.01", "STONE:100.0<n>COAL:10.0<n>IRON_INGOT:5.0<n>COPPER_INGOT:8.5<n>GOLD_INGOT:3.0<n>DIAMOND:0.8<n>EMERALD:0.5<n>mitycznyDiament:0.05")),
 
 
-    DROP_MAIN_GUI_ROWS("drop.gui.main.rows", 4),
+    DROP_MAIN_GUI_ROWS("drop.gui.main.rows", 5),
     DROP_MAIN_GUI_NAME("drop.gui.main.name", "&7Zarządzanie Dropem (Lvl: <drop.level>)", true),
+    DROP_MAIN_GUI_ITEMS_BASIC_LORE("drop.gui.main.item.basic_lore", "&7Podstawowa szansa: &e<baseChance>%", true),
+    DROP_MAIN_GUI_ITEMS_LORE_FORTUNE("drop.gui.main.item.lore_with_fortune", Arrays.asList("&7Bonus z Fortuny <fortuneLevel>: &ex<bonusLevel>", "&7Twoja szansa: &a&l<boostChance>%"), true),
+    DROP_MAIN_GUI_ITEMS_LORE_NO_FORTUNE("drop.gui.main.item.lore_without_fortune", Arrays.asList("&7Twoja szansa: &a&l<baseChance>%", "&8(Użyj kilofa z Fortuną aby zwiększyć!)"), true),
+    DROP_MAIN_GUI_ITEMS_LORE_ACTIVE("drop.gui.main.item.lore_active", Arrays.asList("&a✔ AKTYWNY", "&7Kliknij, aby wyłączyć"), true),
+    DROP_MAIN_GUI_ITEMS_LORE_NOT_ACTIVE("drop.gui.main.item.lore_not_active", Arrays.asList("&c✖ WYŁĄCZONY", "&7Kliknij, aby włączyć"), true),
 
     DROP_PREVIEW_GUI_ROWS("drop.gui.preview.rows", 3),
     DROP_PREVIEW_GUI_NAME("drop.gui.preview.name", "&8Podgląd: Poziom <level>", true),
@@ -58,6 +63,16 @@ public enum Config {
     DROP_SELECTION_GUI_NAME("drop.gui.selection.name", "&8Wybierz poziom do podglądu", true),
     DROP_SELECTION_GUI_BACK("drop.gui.selection.back.name", "&cPowrót do menu", true),
     DROP_SELECTION_GUI_BACK_SLOT("drop.gui.selection.back.slot", 22),
+
+    DROP_MAGNET_GUI_NAME("drop.gui.magnet.name", "&d&lAUTOMATYCZNY DROP", true),
+    DROP_MAGNET_GUI_LORE("drop.gui.magnet.lore", Arrays.asList(
+            "&7Status: <status>",
+            " ",
+            "&eKliknij, aby przełączyć!"
+    ), true),
+    DROP_MAGNET_STATUS_ON("drop.gui.magnet.status.on", "&aWŁĄCZONY", true),
+    DROP_MAGNET_STATUS_OFF("drop.gui.magnet.status.off", "&cWYŁĄCZONY", true),
+    DROP_MAGNET_REQUIRED_LEVEL("drop.gui.magnet.req_level", 10),
 
     DROP_POLISH_NAMES("drop.polish_names", Arrays.asList("STONE:&7Kamień", "COBBLESTONE:&7Bruk (Brak SilkTouch)", "COAL:&8Węgiel", "IRON_INGOT:&7Sztabka Żelaza", "COPPER_INGOT:&6Sztabka Miedzi", "GOLD_INGOT:&eSztabka Złota", "DIAMOND:&bDiament", "EMERALD:&aSzmaragd", "NETHERITE_SCRAP:&5Odłamek Netheritu"), true),
 
@@ -186,7 +201,11 @@ public enum Config {
 
 
     public String getString() {
-        return this.text;
+        if (this == MAIN_PREFIX) {
+            return this.text;
+        }
+
+        return this.text.replace("<prefix>", MAIN_PREFIX.text);
     }
     @Override
     public String toString() {
