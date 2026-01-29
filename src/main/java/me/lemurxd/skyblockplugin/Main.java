@@ -12,6 +12,7 @@ import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.listeners.*;
 import me.lemurxd.skyblockplugin.tasks.DataBaseTask;
 import me.lemurxd.skyblockplugin.tasks.PlayerY;
+import me.pikamug.quests.Quests;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -76,7 +77,26 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new IslandDelete(), getInstance());
         Bukkit.getPluginManager().registerEvents(new StoneGeneratorProtection(), getInstance());
 
+
+        if (getServer().getPluginManager().getPlugin("Quests") instanceof Quests) {
+            getLogger().info("Znaleziono Quests! Rejestrowanie celu MythicMobs...");
+
+            Quests quests = (Quests) getServer().getPluginManager().getPlugin("Quests");
+
+            MythicMobsKillObjective mmObjective = new MythicMobsKillObjective();
+
+            getServer().getPluginManager().registerEvents(mmObjective, getInstance());
+
+            try {
+                quests.getCustomObjectives().add(mmObjective);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+
         new DataBaseTask().runTaskTimer(this, 12000L, 12000L);
+
 
         getCommand("skyblockplugin").setExecutor(new SkyBlockPluginCommand());
         getCommand("drop").setExecutor(new DropCommand());
