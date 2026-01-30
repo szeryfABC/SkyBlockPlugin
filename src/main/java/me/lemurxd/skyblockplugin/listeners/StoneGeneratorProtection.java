@@ -6,6 +6,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+
+import java.util.Iterator;
 
 public class StoneGeneratorProtection implements Listener {
 
@@ -25,6 +28,18 @@ public class StoneGeneratorProtection implements Listener {
             if (StoneGenerator.isStoneGenerator(block.getLocation())) {
                 event.setCancelled(true);
                 return;
+            }
+        }
+    }
+
+    @EventHandler
+    public void onExplode(EntityExplodeEvent e) {
+        Iterator<Block> iterator = e.blockList().iterator();
+
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if (StoneGenerator.isStoneGenerator(block.getLocation())) {
+                iterator.remove();
             }
         }
     }

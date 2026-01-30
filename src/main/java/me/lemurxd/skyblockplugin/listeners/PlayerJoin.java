@@ -36,32 +36,6 @@ public class PlayerJoin implements Listener {
                 SkyBlockUser.createSkyBlockUser(e.getPlayer().getUniqueId(), SkyBlockUser.getDropsForLevel(1), 1, 0, false);
             }
         }
-        if (BentoBox.getInstance().getIslandsManager().hasIsland(Bukkit.getWorld("bskyblock_world"), User.getInstance(e.getPlayer().getUniqueId()))) {
-            if (!StoneGenerator.getMap().containsKey(BentoBox.getInstance().getIslandsManager().getIsland(Bukkit.getWorld("bskyblock_world"), User.getInstance(e.getPlayer().getUniqueId())))) {
-
-                Island island = BentoBox.getInstance().getIslandsManager().getIsland(Bukkit.getWorld("bskyblock_world"), User.getInstance(e.getPlayer().getUniqueId()));
-                String islandUuid = island.getUniqueId();
-
-                Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-
-                    List<StoneGenerator> generators = Main.getDatabase().loadGeneratorsForIsland(island);
-
-                    if (generators == null) generators = new ArrayList<>();
-
-                    final List<StoneGenerator> finalGenerators = generators;
-
-                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-
-                        if (!StoneGenerator.getMap().containsKey(islandUuid)) {
-                            StoneGenerator.getMap().put(islandUuid, finalGenerators);
-                        }
-
-                    });
-
-                });
-
-            }
-        }
     }
 
 }
