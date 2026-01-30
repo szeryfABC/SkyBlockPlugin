@@ -7,7 +7,6 @@ import me.lemurxd.skyblockplugin.utils.DropSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-import world.bentobox.bentobox.database.objects.Island;
 
 import java.util.*;
 

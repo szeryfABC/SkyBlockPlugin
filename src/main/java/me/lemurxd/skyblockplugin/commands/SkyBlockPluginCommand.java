@@ -4,6 +4,7 @@ import me.lemurxd.skyblockplugin.Main;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import me.lemurxd.skyblockplugin.enums.Config;
+import me.lemurxd.skyblockplugin.listeners.ChatFilter;
 import me.lemurxd.skyblockplugin.utils.SafeGive;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -35,6 +36,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             File configFile = new File(Main.getInstance().getDataFolder(), "SkyBlockConfig.yml");
             Config.load(configFile);
 
+            ChatFilter.loadFilter(Config.CENZURA.getStringList());
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aKonfiguracja została pomyślnie przeładowana!");
             return true;
         }
