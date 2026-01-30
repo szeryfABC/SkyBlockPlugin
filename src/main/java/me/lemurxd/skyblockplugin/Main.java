@@ -76,6 +76,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new Inventory(), getInstance());
         Bukkit.getPluginManager().registerEvents(new IslandDelete(), getInstance());
         Bukkit.getPluginManager().registerEvents(new StoneGeneratorProtection(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new StoneGeneratorLoad(), getInstance());
 
 
         if (getServer().getPluginManager().getPlugin("Quests") instanceof Quests) {
