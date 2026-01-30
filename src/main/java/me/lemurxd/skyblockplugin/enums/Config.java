@@ -112,7 +112,8 @@ public enum Config {
     //ORB
     ORB_COOLDOWN("orb.cooldown", 48),
     ORB_ITEM_NAME("orb.mythicitem", "magicznyOrb"),
-    
+
+    CHAT_COOLDOWN("chat.cooldown", 2000),
     CENZURA("cenzura", Arrays.asList("chuj","chuja", "chujek", "chuju", "chujem", "chujnia",
             "chujowy", "chujowa", "chujowe", "cipa", "cipę", "cipe", "cipą",
             "cipie", "dojebać","dojebac", "dojebie", "dojebał", "dojebal",
