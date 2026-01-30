@@ -330,8 +330,6 @@ public class DropMenu {
     }
 
     private String getPolishName(ItemStack itemStack) {
-        // Checking for custom MythicMobs items or similar could be here if needed
-        // Assuming MythicBukkit.inst().getItemManager() is available as per your code
         try {
             if (io.lumine.mythic.bukkit.MythicBukkit.inst().getItemManager().isMythicItem(itemStack)) {
                 return LegacyComponentSerializer.legacySection().serialize(itemStack.getItemMeta().customName());

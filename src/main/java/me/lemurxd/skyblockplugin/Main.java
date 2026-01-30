@@ -68,6 +68,9 @@ public class Main extends JavaPlugin {
             PlayerY.runPlayerYRespawnTimer();
         }
 
+        ChatFilter.loadFilter(Config.CENZURA.getStringList());
+
+
         Bukkit.addRecipe(Generator.getRecipe());
 
         Bukkit.getPluginManager().registerEvents(new BlockBreak(), getInstance());
@@ -77,6 +80,7 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new IslandDelete(), getInstance());
         Bukkit.getPluginManager().registerEvents(new StoneGeneratorProtection(), getInstance());
         Bukkit.getPluginManager().registerEvents(new StoneGeneratorLoad(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new ChatFilter(), getInstance());
 
 
         if (getServer().getPluginManager().getPlugin("Quests") instanceof Quests) {
@@ -94,7 +98,6 @@ public class Main extends JavaPlugin {
                 e.printStackTrace();
             }
         }
-
 
         new DataBaseTask().runTaskTimer(this, 12000L, 12000L);
 
