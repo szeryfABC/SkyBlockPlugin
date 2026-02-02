@@ -32,10 +32,6 @@ public class ChatFilter implements Listener {
         LEET_MAP.put('(', 'c');
     }
 
-    /**
-     * Ładowanie bazy słów do drzewa Aho-Corasick.
-     * Wywoływane raz przy starcie lub reloadzie.
-     */
     public static void loadFilter(List<String> badWords) {
         acAlgorithm = new AhoCorasick();
         if (badWords != null) {
