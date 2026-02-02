@@ -6,7 +6,7 @@
 
     <groupId>me.lemurxd.skyblockplugin</groupId>
     <artifactId>SkyBlockPlugin</artifactId>
-    <version>0.5</version>
+    <version>0.6</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
