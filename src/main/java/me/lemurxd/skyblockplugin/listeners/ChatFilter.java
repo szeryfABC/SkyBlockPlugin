@@ -10,12 +10,17 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ChatFilter implements Listener {
 
     private static AhoCorasick acAlgorithm;
     private final Map<UUID, Long> cooldowns = new ConcurrentHashMap<>();
     private static final Random random = new Random();
+
+    private static final double PROFANITY_THRESHOLD = 0.60;
 
     private static final Map<Character, Character> LEET_MAP = new HashMap<>();
     static {
@@ -48,22 +53,15 @@ public class ChatFilter implements Listener {
         StringBuilder cleanTextBuilder = new StringBuilder();
         int[] indexMap = new int[message.length()];
         int cleanIndex = 0;
-
         char lastChar = 0;
 
         for (int i = 0; i < message.length(); i++) {
             char originalChar = message.charAt(i);
             char c = Character.toLowerCase(originalChar);
-
             c = LEET_MAP.getOrDefault(c, c);
 
-            if (!Character.isLetterOrDigit(c)) {
-                continue;
-            }
-
-            if (c == lastChar) {
-                continue;
-            }
+            if (!Character.isLetterOrDigit(c)) continue;
+            if (c == lastChar) continue;
 
             cleanTextBuilder.append(c);
             indexMap[cleanIndex] = i;
@@ -72,33 +70,86 @@ public class ChatFilter implements Listener {
         }
 
         String cleanText = cleanTextBuilder.toString();
-
         List<IntRange> matches = acAlgorithm.search(cleanText);
 
-        if (matches.isEmpty()) {
-            return message;
-        }
+        if (matches.isEmpty()) return message;
 
         matches = mergeIntervals(matches);
-
-        StringBuilder result = new StringBuilder(message);
-        List<String> replacements = Config.CENZURA.getStringList();
+        List<IntRange> finalReplacementRanges = new ArrayList<>();
 
         for (int i = matches.size() - 1; i >= 0; i--) {
-            IntRange range = matches.get(i);
+            IntRange match = matches.get(i);
+            if (match.start >= cleanIndex || match.end > cleanIndex) continue;
 
-            if (range.start >= cleanIndex || range.end > cleanIndex) continue;
+            int detectedStart = indexMap[match.start];
+            int detectedEnd = indexMap[match.end - 1] + 1;
 
-            int originalStart = indexMap[range.start];
+            int wordStart = findWordStart(message, detectedStart);
+            int wordEnd = findWordEnd(message, detectedEnd);
 
-            int originalEnd = indexMap[range.end - 1] + 1;
+            int cleanBadLength = match.end - match.start;
 
+            String fullOriginalWord = message.substring(wordStart, wordEnd);
+
+            int cleanFullWordLength = getCollapsedLength(fullOriginalWord);
+
+            if (cleanFullWordLength == 0) cleanFullWordLength = 1;
+
+            double ratio = (double) cleanBadLength / cleanFullWordLength;
+
+            if (ratio < PROFANITY_THRESHOLD) {
+                continue;
+            }
+
+            finalReplacementRanges.add(new IntRange(wordStart, wordEnd));
+        }
+
+        finalReplacementRanges = mergeIntervals(finalReplacementRanges);
+
+        StringBuilder result = new StringBuilder(message);
+        List<String> replacements = Config.CENZURA_REPLACE.getStringList();
+
+        for (int i = finalReplacementRanges.size() - 1; i >= 0; i--) {
+            IntRange range = finalReplacementRanges.get(i);
             String replacement = replacements.isEmpty() ? "*uwu*" : replacements.get(random.nextInt(replacements.size()));
-
-            result.replace(originalStart, originalEnd, replacement);
+            result.replace(range.start, range.end, replacement);
         }
 
         return result.toString();
+    }
+
+    private static int getCollapsedLength(String word) {
+        if (word == null || word.isEmpty()) return 0;
+        int length = 0;
+        char last = 0;
+
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            if (!Character.isLetterOrDigit(c)) continue;
+
+            c = Character.toLowerCase(c);
+            c = LEET_MAP.getOrDefault(c, c);
+
+            if (c == last) continue;
+
+            length++;
+            last = c;
+        }
+        return length;
+    }
+
+    private static int findWordStart(String text, int index) {
+        while (index > 0 && !Character.isWhitespace(text.charAt(index - 1))) {
+            index--;
+        }
+        return index;
+    }
+
+    private static int findWordEnd(String text, int index) {
+        while (index < text.length() && !Character.isWhitespace(text.charAt(index))) {
+            index++;
+        }
+        return index;
     }
 
     private static List<IntRange> mergeIntervals(List<IntRange> ranges) {
@@ -149,25 +200,20 @@ public class ChatFilter implements Listener {
 
         public void buildFailureLinks() {
             Queue<TrieNode> queue = new LinkedList<>();
-
             for (TrieNode child : root.children.values()) {
                 child.failure = root;
                 queue.add(child);
             }
-
             while (!queue.isEmpty()) {
                 TrieNode current = queue.poll();
-
                 for (Map.Entry<Character, TrieNode> entry : current.children.entrySet()) {
                     char c = entry.getKey();
                     TrieNode child = entry.getValue();
-
                     TrieNode temp = current.failure;
                     while (temp != null && !temp.children.containsKey(c)) {
                         temp = temp.failure;
                     }
                     child.failure = (temp == null) ? root : temp.children.get(c);
-
                     queue.add(child);
                 }
             }
@@ -176,24 +222,20 @@ public class ChatFilter implements Listener {
         public List<IntRange> search(String text) {
             List<IntRange> found = new ArrayList<>();
             TrieNode current = root;
-
             for (int i = 0; i < text.length(); i++) {
                 char c = text.charAt(i);
-
                 while (current != null && !current.children.containsKey(c)) {
                     current = current.failure;
                 }
-
                 if (current == null) {
                     current = root;
                     continue;
                 }
-
                 current = current.children.get(c);
-
                 TrieNode temp = current;
                 while (temp != root) {
                     if (temp.isEndOfWord) {
+                        // Dodajemy +1 do startu i endu w IntRange, bo w substringach end jest exclusive
                         found.add(new IntRange(i - temp.depth + 1, i + 1));
                     }
                     temp = temp.failure;
@@ -202,7 +244,6 @@ public class ChatFilter implements Listener {
             return found;
         }
     }
-
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onChat(AsyncPlayerChatEvent e) {

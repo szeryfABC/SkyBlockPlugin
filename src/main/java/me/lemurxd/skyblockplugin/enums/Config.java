@@ -238,6 +238,7 @@ public enum Config {
             "zapierniczający", "zasrać", "zasranym", "zasrywać", "zasrywający",
             "zesrywać", "zesrywający", "zjebać", "zjebac", "zjebał", "zjebal",
             "zjebała", "zjebala", "zjebana", "zjebią", "zjebali", "zjeby")),
+    CENZURA_REPLACE("cenzura_replace", Arrays.asList("*uwu*", "*meow*"))
 
     ;
 

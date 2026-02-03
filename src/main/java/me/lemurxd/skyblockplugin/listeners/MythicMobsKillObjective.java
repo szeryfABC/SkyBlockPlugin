@@ -17,7 +17,7 @@ public class MythicMobsKillObjective extends BukkitCustomObjective implements Li
 
     public MythicMobsKillObjective() {
 
-        setName("Kill MythicMob");
+        setName("KillMythicMob");
         setAuthor("lemurxd_");
 
         setItem("DIAMOND_SWORD", (short) 0);
