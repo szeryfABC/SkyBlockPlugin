@@ -1,6 +1,6 @@
 package me.lemurxd.skyblockplugin.tasks;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import me.lemurxd.skyblockplugin.utils.DropSerializer;
@@ -38,7 +38,7 @@ public class DataBaseTask extends BukkitRunnable {
 
         Map<String, List<StoneGenerator>> generatorsSnapshot = new HashMap<>(StoneGenerator.getMap());
 
-        Main.getInstance().getLogger().info("[AutoSave] Przygotowano do zapisu: " + usersToSave.size() + " graczy.");
+        SkyBlockPlugin.getInstance().getLogger().info("[AutoSave] Przygotowano do zapisu: " + usersToSave.size() + " graczy.");
 
         new BukkitRunnable() {
             @Override
@@ -46,19 +46,19 @@ public class DataBaseTask extends BukkitRunnable {
                 saveUsersAsync(usersToSave);
                 saveGeneratorsAsync(generatorsSnapshot);
             }
-        }.runTaskAsynchronously(Main.getInstance());
+        }.runTaskAsynchronously(SkyBlockPlugin.getInstance());
     }
 
     private void saveUsersAsync(List<UserSnapshot> users) {
         try {
-            Main.getUserDatabase().saveUsersBatch(users);
+            SkyBlockPlugin.getUserDatabase().saveUsersBatch(users);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void saveGeneratorsAsync(Map<String, List<StoneGenerator>> generators) {
-        Main.getDatabase().saveGenerators(generators);
+        SkyBlockPlugin.getDatabase().saveGenerators(generators);
     }
 
     public record UserSnapshot(String uuid, int level, String data, long lastOrbUsage, boolean magnetEnabled) {}

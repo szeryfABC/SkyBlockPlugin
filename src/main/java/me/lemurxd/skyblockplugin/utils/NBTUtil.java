@@ -1,6 +1,6 @@
 package me.lemurxd.skyblockplugin.utils;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -16,7 +16,7 @@ public class NBTUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        NamespacedKey namespacedKey = new NamespacedKey(Main.getInstance(), key);
+        NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
 
         container.set(namespacedKey, PersistentDataType.STRING, value);
 
@@ -30,7 +30,7 @@ public class NBTUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        NamespacedKey namespacedKey = new NamespacedKey(Main.getInstance(), key);
+        NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
 
         if (container.has(namespacedKey, PersistentDataType.STRING)) {
             return container.get(namespacedKey, PersistentDataType.STRING);
@@ -43,7 +43,7 @@ public class NBTUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        NamespacedKey namespacedKey = new NamespacedKey(Main.getInstance(), key);
+        NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
 
         container.set(namespacedKey, PersistentDataType.INTEGER, value);
 
@@ -56,7 +56,7 @@ public class NBTUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        NamespacedKey namespacedKey = new NamespacedKey(Main.getInstance(), key);
+        NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
 
         if (container.has(namespacedKey, PersistentDataType.INTEGER)) {
             //noinspection DataFlowIssue
@@ -70,7 +70,7 @@ public class NBTUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        NamespacedKey namespacedKey = new NamespacedKey(Main.getInstance(), key);
+        NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
 
         return container.has(namespacedKey, PersistentDataType.STRING)
                 || container.has(namespacedKey, PersistentDataType.INTEGER);

@@ -30,6 +30,13 @@ public enum Config {
     //Main
     MAIN_PREFIX("main.variables_prefix", "&a&lOF &f| ", true),
 
+    //Database
+    MYSQL_IP("mysql.ip", "localhost"),
+    MYSQL_PORT("mysql.port", 3306),
+    MYSQL_NAME("mysql.name", "minecraft_db"),
+    MYSQL_USER("mysql.user", "user"),
+    MYSQL_PASSWORD("mysql.password", "password"),
+
     //Messages
     MESSAGES_ONLY_PLAYERS("messages.only_for_players", "<prefix>&cTa komenda jest dostępna tylko dla graczy!", true),
     MESSAGES_NOT_ENOUGH_MONEY("messages.not_enough_money", "<prefix>&cNie masz wystarczająco pieniędzy!"),

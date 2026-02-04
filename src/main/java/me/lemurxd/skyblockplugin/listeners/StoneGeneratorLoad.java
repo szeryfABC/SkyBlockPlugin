@@ -1,6 +1,6 @@
 package me.lemurxd.skyblockplugin.listeners;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -34,11 +34,11 @@ public class StoneGeneratorLoad implements Listener {
 
                 loadingQueue.add(island.getUniqueId());
 
-                Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
+                Bukkit.getScheduler().runTaskAsynchronously(SkyBlockPlugin.getInstance(), () -> {
 
                     List<StoneGenerator> generators = null;
                     try {
-                        generators = Main.getDatabase().loadGeneratorsForIsland(island);
+                        generators = SkyBlockPlugin.getDatabase().loadGeneratorsForIsland(island);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -47,7 +47,7 @@ public class StoneGeneratorLoad implements Listener {
 
                     final List<StoneGenerator> finalGenerators = generators;
 
-                    Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                    Bukkit.getScheduler().runTask(SkyBlockPlugin.getInstance(), () -> {
                         try {
                             if (!StoneGenerator.getMap().containsKey(island.getUniqueId())) {
                                 StoneGenerator.getMap().put(island.getUniqueId(), finalGenerators);

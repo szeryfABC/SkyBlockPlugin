@@ -1,14 +1,11 @@
 package me.lemurxd.skyblockplugin.listeners;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import world.bentobox.bentobox.api.events.island.IslandDeleteEvent;
-import world.bentobox.bentobox.database.objects.Island;
-
-import java.util.Optional;
 
 public class IslandDelete  implements Listener{
 
@@ -21,8 +18,8 @@ public class IslandDelete  implements Listener{
 
         StoneGenerator.getMap().keySet().removeIf(optIsland -> optIsland.equals(islandId));
 
-        Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-            Main.getDatabase().deleteGeneratorsForIsland(islandId);
+        Bukkit.getScheduler().runTaskAsynchronously(SkyBlockPlugin.getInstance(), () -> {
+            SkyBlockPlugin.getDatabase().deleteGeneratorsForIsland(islandId);
         });
     }
 }

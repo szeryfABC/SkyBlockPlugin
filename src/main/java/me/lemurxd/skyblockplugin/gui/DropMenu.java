@@ -1,8 +1,7 @@
 package me.lemurxd.skyblockplugin.gui;
 
 import com.gmail.nossr50.api.ExperienceAPI;
-import io.lumine.mythic.bukkit.MythicBukkit;
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.DropEntry;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.enums.Config;
@@ -124,11 +123,11 @@ public class DropMenu {
             upgradeLore.add(" ");
             upgradeLore.add(ChatColor.GRAY + "Koszt: " + ChatColor.GREEN + cost + "$");
 
-            if (Main.getEconomy() != null) {
-                if (Main.getEconomy().has(player, cost)) {
+            if (SkyBlockPlugin.getEconomy() != null) {
+                if (SkyBlockPlugin.getEconomy().has(player, cost)) {
                     upgradeLore.add(ChatColor.YELLOW + "Kliknij, aby kupić ulepszenie!");
                 } else {
-                    upgradeLore.add(ChatColor.RED + "Nie stać Cię! Brakuje: " + (cost - Main.getEconomy().getBalance(player)) + "$");
+                    upgradeLore.add(ChatColor.RED + "Nie stać Cię! Brakuje: " + (cost - SkyBlockPlugin.getEconomy().getBalance(player)) + "$");
                 }
             }
             upgradeMeta.setLore(upgradeLore);
@@ -240,12 +239,12 @@ public class DropMenu {
 
         double cost = getUpgradeCost(user.getDropLevel());
 
-        if (Main.getEconomy() != null) {
-            if (!Main.getEconomy().has(player, cost)) {
+        if (SkyBlockPlugin.getEconomy() != null) {
+            if (!SkyBlockPlugin.getEconomy().has(player, cost)) {
                 player.sendMessage(Config.MESSAGES_NOT_ENOUGH_MONEY.getString());
                 return;
             }
-            Main.getEconomy().withdrawPlayer(player, cost);
+            SkyBlockPlugin.getEconomy().withdrawPlayer(player, cost);
         }
 
         int newLevel = user.getDropLevel() + 1;

@@ -1,6 +1,6 @@
 package me.lemurxd.skyblockplugin.commands;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import me.lemurxd.skyblockplugin.enums.Config;
@@ -33,7 +33,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
         }
 
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            File configFile = new File(Main.getInstance().getDataFolder(), "SkyBlockConfig.yml");
+            File configFile = new File(SkyBlockPlugin.getInstance().getDataFolder(), "SkyBlockConfig.yml");
             Config.load(configFile);
 
             ChatFilter.loadFilter(Config.CENZURA.getStringList());
@@ -125,13 +125,13 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(targetName);
                     UUID targetUUID = offlinePlayer.getUniqueId();
 
-                    Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-                        SkyBlockUser user = Main.getUserDatabase().loadUser(targetUUID);
+                    Bukkit.getScheduler().runTaskAsynchronously(SkyBlockPlugin.getInstance(), () -> {
+                        SkyBlockUser user = SkyBlockPlugin.getUserDatabase().loadUser(targetUUID);
 
                         if (user != null) {
                             user.setDropLevel(level);
 
-                            Main.getUserDatabase().saveUser(user);
+                            SkyBlockPlugin.getUserDatabase().saveUser(user);
 
                             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie zaktualizowano poziom gracza " + targetName + " na " + level + " w bazie danych.");
                         } else {
@@ -166,12 +166,12 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(targetName);
                     UUID targetUUID = offlinePlayer.getUniqueId();
 
-                    Bukkit.getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
-                        SkyBlockUser user = Main.getUserDatabase().loadUser(targetUUID);
+                    Bukkit.getScheduler().runTaskAsynchronously(SkyBlockPlugin.getInstance(), () -> {
+                        SkyBlockUser user = SkyBlockPlugin.getUserDatabase().loadUser(targetUUID);
 
                         if (user != null) {
                             user.setLastOrbUsage(0);
-                            Main.getUserDatabase().saveUser(user);
+                            SkyBlockPlugin.getUserDatabase().saveUser(user);
 
                             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie zresetowano czas orba dla gracza " + targetName + " w bazie danych.");
                         } else {

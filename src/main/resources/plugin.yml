@@ -1,6 +1,6 @@
 name: SkyblockPlugin
 version: 1.0.0
-main: me.lemurxd.skyblockplugin.Main
+main: me.lemurxd.skyblockplugin.SkyBlockPlugin
 depend: [BentoBox, Vault]
 api-version: 1.21
 author: lemurxd

@@ -10,9 +10,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ChatFilter implements Listener {
 
@@ -21,6 +18,7 @@ public class ChatFilter implements Listener {
     private static final Random random = new Random();
 
     private static final double PROFANITY_THRESHOLD = 0.60;
+    private static final int MAX_SAFE_WORD_LENGTH = 13;
 
     private static final Map<Character, Character> LEET_MAP = new HashMap<>();
     static {
@@ -35,6 +33,7 @@ public class ChatFilter implements Listener {
         LEET_MAP.put('7', 't');
         LEET_MAP.put('+', 't');
         LEET_MAP.put('(', 'c');
+        LEET_MAP.put('_', ' ');
     }
 
     public static void loadFilter(List<String> badWords) {
@@ -97,7 +96,7 @@ public class ChatFilter implements Listener {
 
             double ratio = (double) cleanBadLength / cleanFullWordLength;
 
-            if (ratio < PROFANITY_THRESHOLD) {
+            if (cleanFullWordLength <= MAX_SAFE_WORD_LENGTH && ratio < PROFANITY_THRESHOLD) {
                 continue;
             }
 
@@ -235,7 +234,6 @@ public class ChatFilter implements Listener {
                 TrieNode temp = current;
                 while (temp != root) {
                     if (temp.isEndOfWord) {
-                        // Dodajemy +1 do startu i endu w IntRange, bo w substringach end jest exclusive
                         found.add(new IntRange(i - temp.depth + 1, i + 1));
                     }
                     temp = temp.failure;

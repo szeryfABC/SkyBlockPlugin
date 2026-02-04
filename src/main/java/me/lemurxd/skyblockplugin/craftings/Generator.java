@@ -1,22 +1,18 @@
 package me.lemurxd.skyblockplugin.craftings;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import me.lemurxd.skyblockplugin.enums.Config;
-import me.lemurxd.skyblockplugin.utils.NBTUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Generator {
 
     public static ShapedRecipe getRecipe() {
-        NamespacedKey key = new NamespacedKey(Main.getInstance(), "stoneGenerator");
+        NamespacedKey key = new NamespacedKey(SkyBlockPlugin.getInstance(), "stoneGenerator");
         List<String> shapeStrings = (List<String>) Config.GENERATOR_RECIPE_SHAPE.getStringList();
         List<String> ingredientStrings = (List<String>) Config.GENERATOR_RECIPE_INGREDIENTS.getStringList();
 

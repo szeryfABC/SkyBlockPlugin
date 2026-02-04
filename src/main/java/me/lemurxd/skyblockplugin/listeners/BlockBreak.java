@@ -1,6 +1,6 @@
 package me.lemurxd.skyblockplugin.listeners;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.constructors.DropEntry;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
@@ -46,7 +46,7 @@ public class BlockBreak implements Listener {
         boolean isGeneratorStone = StoneGenerator.isStoneGenerator(underLoc);
 
         if (isGeneratorStone) {
-            Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+            Bukkit.getScheduler().runTaskLater(SkyBlockPlugin.getInstance(), () -> {
                 if (block.getType() == Material.AIR) {
                     block.setType(Material.STONE);
                 }

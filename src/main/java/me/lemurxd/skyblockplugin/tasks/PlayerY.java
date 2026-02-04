@@ -1,6 +1,6 @@
 package me.lemurxd.skyblockplugin.tasks;
 
-import me.lemurxd.skyblockplugin.Main;
+import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.enums.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 public class PlayerY {
 
     public static void runPlayerYRespawnTimer() {
-        Bukkit.getScheduler().runTaskTimer(Main.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskTimer(SkyBlockPlugin.getInstance(), () -> {
             if (!Config.SAFE_SPAWN_ENABLED.getBoolean()) return;
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.getWorld().equals(Config.SAFE_SPAWN_WORLD.getString()) && p.getLocation().getY() <= Config.SAFE_SPAWN_Y.getInt()) {

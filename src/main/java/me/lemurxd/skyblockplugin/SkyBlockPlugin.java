@@ -6,6 +6,7 @@ import me.lemurxd.skyblockplugin.commands.SkyBlockPluginCommand;
 import me.lemurxd.skyblockplugin.constructors.SkyBlockUser;
 import me.lemurxd.skyblockplugin.constructors.StoneGenerator;
 import me.lemurxd.skyblockplugin.craftings.Generator;
+import me.lemurxd.skyblockplugin.database.DatabaseManager;
 import me.lemurxd.skyblockplugin.database.SkyBlockUserDatabase;
 import me.lemurxd.skyblockplugin.database.StoneGeneratorDatabase;
 import me.lemurxd.skyblockplugin.enums.Config;
@@ -23,13 +24,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Main extends JavaPlugin {
+public class SkyBlockPlugin extends JavaPlugin {
 
     private static Economy economy;
 
-    private static Main instance;
+    private static SkyBlockPlugin instance;
     private static StoneGeneratorDatabase generatorDatabase;
     private static SkyBlockUserDatabase userDatabase;
+    private static DatabaseManager dbManager;
     private Connection connection;
 
     private void setupEconomy() {
@@ -56,6 +58,8 @@ public class Main extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        dbManager = new DatabaseManager(getInstance(), Config.MYSQL_IP.getString(), Config.MYSQL_PORT.getInt(), Config.MYSQL_NAME.getString(), Config.MYSQL_USER.getString(), Config.MYSQL_PASSWORD.getString());
 
         generatorDatabase = new StoneGeneratorDatabase(connection);
         userDatabase = new SkyBlockUserDatabase(connection);
@@ -123,6 +127,11 @@ public class Main extends JavaPlugin {
             }
         }
 
+        if (dbManager != null) {
+            getLogger().info("Zapisywanie bazy...");
+            dbManager.close();
+        }
+
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
@@ -135,7 +144,7 @@ public class Main extends JavaPlugin {
         getLogger().info("Pomyślnie zapisano dane i wyłączono plugin.");
     }
 
-    public static Main getInstance() {
+    public static SkyBlockPlugin getInstance() {
         return instance;
     }
 
@@ -149,6 +158,10 @@ public class Main extends JavaPlugin {
 
     public static SkyBlockUserDatabase getUserDatabase() {
         return userDatabase;
+    }
+
+    public static DatabaseManager getDbManager() {
+        return dbManager;
     }
 
     public void saveMainYML() {
