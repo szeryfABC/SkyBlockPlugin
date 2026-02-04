@@ -59,7 +59,6 @@ public class NBTUtil {
         NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
 
         if (container.has(namespacedKey, PersistentDataType.INTEGER)) {
-            //noinspection DataFlowIssue
             return container.get(namespacedKey, PersistentDataType.INTEGER);
         }
         return 0;
