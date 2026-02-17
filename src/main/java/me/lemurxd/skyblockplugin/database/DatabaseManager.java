@@ -28,8 +28,17 @@ public class DatabaseManager {
 
     public DatabaseManager(JavaPlugin plugin, String host, int port, String database, String user, String password) {
         this.plugin = plugin;
-        initDataSource(host, port, database, user, password);
-        createTable();
+        try {
+            initDataSource(host, port, database, user, password);
+            createTable();
+            plugin.getLogger().info("Pomyslnie polaczono z baza danych!");
+        } catch (Exception e) {
+            plugin.getLogger().warning("--------------------------------------------------");
+            plugin.getLogger().warning("NIE UDALO SIE POLACZYC Z BAZA DANYCH!");
+            plugin.getLogger().warning("Plugin bedzie dzialal, ale zapis ekwipunku jest WYLACZONY.");
+            plugin.getLogger().warning("--------------------------------------------------");
+            this.dataSource = null;
+        }
     }
 
     private void initDataSource(String host, int port, String database, String user, String password) {
@@ -71,6 +80,8 @@ public class DatabaseManager {
     }
 
     public void savePlayerInventory(Player player) {
+        if (this.dataSource == null) return;
+
         UUID uuid = player.getUniqueId();
         String contentsBase64 = itemStackArrayToBase64(player.getInventory().getContents());
         String armorBase64 = itemStackArrayToBase64(player.getInventory().getArmorContents());
@@ -102,6 +113,8 @@ public class DatabaseManager {
     }
 
     public void loadPlayerInventory(Player player) {
+        if (this.dataSource == null) return;
+
         UUID uuid = player.getUniqueId();
 
         CompletableFuture.supplyAsync(() -> {

@@ -1,4 +1,4 @@
-package me.lemurxd.skyblockplugin.listeners;
+package me.lemurxd.skyblockplugin.objectives;
 
 import me.pikamug.quests.Quests;
 import me.pikamug.quests.module.BukkitCustomObjective;

@@ -31,6 +31,7 @@ public enum Config {
     MAIN_PREFIX("main.variables_prefix", "&a&lOF &f| ", true),
 
     //Database
+    MYSQL_ENABLED("mysql.enabled", false),
     MYSQL_IP("mysql.ip", "localhost"),
     MYSQL_PORT("mysql.port", 3306),
     MYSQL_NAME("mysql.name", "minecraft_db"),
@@ -119,6 +120,11 @@ public enum Config {
     //ORB
     ORB_COOLDOWN("orb.cooldown", 48),
     ORB_ITEM_NAME("orb.mythicitem", "magicznyOrb"),
+
+    RARITY_LIST("custom_items.rarity.rarity_list", Arrays.asList("&8&l&oZEPSUTY:10", "&8&l&oUSZKODZONY:15", "&f&lZWYKŁY:25", "&b&lRZADKI:23", "&5&lEPICKI:20", "&6&lLEGENDARNY:6", "&4&k&l7 &r&4&lBOSKI &4&k&l7:1"), true),
+    RARITY_MODIFIER("custom_items.rarity.rarity_modifiers", Arrays.asList("ZEPSUTY:-100", "USZKODZONY:-50", "ZWYKŁY:0", "RZADKI:+25", "EPICKI:+50", "LEGENDARNY:+125", "7 BOSKI 7:+250")),
+    RARITY_DEBUG("custom_items.rarity.debug", false),
+
 
     CHAT_COOLDOWN("chat.cooldown", 2000),
     CENZURA("cenzura", Arrays.asList("chuj","chuja", "chujek", "chuju", "chujem", "chujnia",

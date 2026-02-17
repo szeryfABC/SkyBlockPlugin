@@ -1,4 +1,4 @@
-package me.lemurxd.skyblockplugin.listeners;
+package me.lemurxd.skyblockplugin.objectives;
 
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.mobs.ActiveMob;
@@ -23,11 +23,10 @@ public class MythicMobsKillObjective extends BukkitCustomObjective implements Li
         setItem("DIAMOND_SWORD", (short) 0);
         setShowCount(true);
 
-        addStringPrompt("MythicMob ID", "Wpisz wewnętrzną nazwę moba z MythicMob", null);
-        addStringPrompt("MythicMob Name", "Wpisz nazwę moba wyświetlaną w statusie zadania", null);
+        addStringPrompt("MythicMob ID", "Wpisz nazwy wewnętrzne mobów (ID) oddzielone przecinkami, np. Mob1,Mob2", null);
+        addStringPrompt("MythicMob Name", "Wpisz nazwę wyświetlaną (możesz wpisać np. 'Zombie lub Szkielet')", null);
 
         setDisplay("Zabij: %MythicMob Name%: %count%");
-
     }
 
     @EventHandler
@@ -59,10 +58,23 @@ public class MythicMobsKillObjective extends BukkitCustomObjective implements Li
             Map<String, Object> dataMap = getDataForPlayer(killer.getUniqueId(), this, quest);
 
             if (dataMap != null) {
-                String targetMobName = (String) dataMap.get("MM Internal Name");
+                String configuredMobIDs = (String) dataMap.get("MythicMob ID");
 
-                if (targetMobName != null && targetMobName.equalsIgnoreCase(mobInternalName)) {
-                    incrementObjective(killer.getUniqueId(), this, quest, 1);
+                if (configuredMobIDs != null) {
+                    String[] acceptedMobs = configuredMobIDs.split(",");
+
+                    boolean matchFound = false;
+
+                    for (String id : acceptedMobs) {
+                        if (id.trim().equalsIgnoreCase(mobInternalName)) {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+
+                    if (matchFound) {
+                        incrementObjective(killer.getUniqueId(), this, quest, 1);
+                    }
                 }
             }
         }

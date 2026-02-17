@@ -7,12 +7,14 @@ import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.listeners.ChatFilter;
 import me.lemurxd.skyblockplugin.utils.SafeGive;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static me.lemurxd.skyblockplugin.lore.CustomLore.developers;
+import static me.lemurxd.skyblockplugin.lore.Rarity.buildDevItem;
 
 public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
 
@@ -35,9 +40,42 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
             File configFile = new File(SkyBlockPlugin.getInstance().getDataFolder(), "SkyBlockConfig.yml");
             Config.load(configFile);
-
             ChatFilter.loadFilter(Config.CENZURA.getStringList());
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aKonfiguracja została pomyślnie przeładowana!");
+            return true;
+        }
+
+        if (args.length >= 1 && args[0].equalsIgnoreCase("devmode")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage("§cTylko dla graczy.");
+                return true;
+            }
+            Player player = (Player) sender;
+
+            if (args.length == 2 && args[1].equalsIgnoreCase("item")) {
+                if (!developers.contains(player.getUniqueId())) {
+                    sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cMusisz włączyć tryb deweloperski (/sbp devmode) aby tego użyć!");
+                    return true;
+                }
+
+                ItemStack handItem = player.getInventory().getItemInMainHand();
+                if (handItem.getType() == Material.AIR) {
+                    sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cTrzymaj przedmiot w ręce!");
+                    return true;
+                }
+
+                buildDevItem(handItem, player, player.getInventory().getHeldItemSlot());
+                sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aWygenerowano makietę deweloperską przedmiotu.");
+                return true;
+            }
+
+            if (developers.contains(player.getUniqueId())) {
+                developers.remove(player.getUniqueId());
+                sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cTryb deweloperski wyłączony.");
+            } else {
+                developers.add(player.getUniqueId());
+                sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aTryb deweloperski włączony.");
+            }
             return true;
         }
 
@@ -47,6 +85,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give orb [gracz]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp drop set <gracz> <poziom>");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb reset <gracz>");
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp devmode [item]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp reload");
             return true;
         }
@@ -195,6 +234,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
             completions.add("give");
             completions.add("drop");
             completions.add("orb");
+            completions.add("devmode");
             completions.add("reload");
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("give")) {
@@ -204,6 +244,8 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
                 completions.add("set");
             } else if (args[0].equalsIgnoreCase("orb")) {
                 completions.add("reset");
+            } else if (args[0].equalsIgnoreCase("devmode")) {
+                completions.add("item");
             }
         } else if (args.length == 3) {
             return null;

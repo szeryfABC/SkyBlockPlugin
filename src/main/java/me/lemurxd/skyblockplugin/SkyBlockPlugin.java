@@ -11,8 +11,11 @@ import me.lemurxd.skyblockplugin.database.SkyBlockUserDatabase;
 import me.lemurxd.skyblockplugin.database.StoneGeneratorDatabase;
 import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.listeners.*;
+import me.lemurxd.skyblockplugin.nether.NetherAcces;
+import me.lemurxd.skyblockplugin.objectives.*;
 import me.lemurxd.skyblockplugin.tasks.DataBaseTask;
 import me.lemurxd.skyblockplugin.tasks.PlayerY;
+import me.lemurxd.skyblockplugin.utils.BaseFile;
 import me.pikamug.quests.Quests;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -34,6 +37,8 @@ public class SkyBlockPlugin extends JavaPlugin {
     private static DatabaseManager dbManager;
     private Connection connection;
 
+    private static BaseFile dataFile;
+
     private void setupEconomy() {
         if (Bukkit.getPluginManager().getPlugin("Vault") == null) return;
         RegisteredServiceProvider<Economy> rsp = Bukkit.getServicesManager().getRegistration(Economy.class);
@@ -50,6 +55,14 @@ public class SkyBlockPlugin extends JavaPlugin {
             getDataFolder().mkdirs();
         }
 
+        dataFile = new BaseFile(getInstance());
+
+        if (Config.SAFE_SPAWN_ENABLED.getBoolean()) {
+            PlayerY.runPlayerYRespawnTimer();
+        }
+
+        ChatFilter.loadFilter(Config.CENZURA.getStringList());
+
         try {
             File databaseFile = new File(getDataFolder(), "baza.db");
             connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
@@ -59,7 +72,9 @@ public class SkyBlockPlugin extends JavaPlugin {
             return;
         }
 
-        dbManager = new DatabaseManager(getInstance(), Config.MYSQL_IP.getString(), Config.MYSQL_PORT.getInt(), Config.MYSQL_NAME.getString(), Config.MYSQL_USER.getString(), Config.MYSQL_PASSWORD.getString());
+        if (Config.MYSQL_ENABLED.getBoolean()) {
+            dbManager = new DatabaseManager(getInstance(), Config.MYSQL_IP.getString(), Config.MYSQL_PORT.getInt(), Config.MYSQL_NAME.getString(), Config.MYSQL_USER.getString(), Config.MYSQL_PASSWORD.getString());
+        }
 
         generatorDatabase = new StoneGeneratorDatabase(connection);
         userDatabase = new SkyBlockUserDatabase(connection);
@@ -68,12 +83,6 @@ public class SkyBlockPlugin extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
-        if (Config.SAFE_SPAWN_ENABLED.getBoolean()) {
-            PlayerY.runPlayerYRespawnTimer();
-        }
-
-        ChatFilter.loadFilter(Config.CENZURA.getStringList());
-
 
         Bukkit.addRecipe(Generator.getRecipe());
 
@@ -85,6 +94,8 @@ public class SkyBlockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new StoneGeneratorProtection(), getInstance());
         Bukkit.getPluginManager().registerEvents(new StoneGeneratorLoad(), getInstance());
         Bukkit.getPluginManager().registerEvents(new ChatFilter(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new SlotChange(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new NetherAcces(), getInstance());
 
 
         if (getServer().getPluginManager().getPlugin("Quests") instanceof Quests) {
@@ -93,11 +104,26 @@ public class SkyBlockPlugin extends JavaPlugin {
             Quests quests = (Quests) getServer().getPluginManager().getPlugin("Quests");
 
             MythicMobsKillObjective mmObjective = new MythicMobsKillObjective();
+            EatSomethingObjective eatObjective = new EatSomethingObjective();
+            ProtectedBlockPlaceObjective placeObjective = new ProtectedBlockPlaceObjective();
+            DeliverItemToNPCObjective deliverObjective = new DeliverItemToNPCObjective();
+            CraftItemObjective craftObjective = new CraftItemObjective();
+            ProtectedBlockBreakObjective breakObjective = new ProtectedBlockBreakObjective();
 
             getServer().getPluginManager().registerEvents(mmObjective, getInstance());
+            getServer().getPluginManager().registerEvents(eatObjective, getInstance());
+            getServer().getPluginManager().registerEvents(placeObjective, getInstance());
+            getServer().getPluginManager().registerEvents(deliverObjective, getInstance());
+            getServer().getPluginManager().registerEvents(craftObjective, getInstance());
+            getServer().getPluginManager().registerEvents(breakObjective, getInstance());
 
             try {
                 quests.getCustomObjectives().add(mmObjective);
+                quests.getCustomObjectives().add(eatObjective);
+                quests.getCustomObjectives().add(placeObjective);
+                quests.getCustomObjectives().add(deliverObjective);
+                quests.getCustomObjectives().add(craftObjective);
+                quests.getCustomObjectives().add(breakObjective);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -146,6 +172,10 @@ public class SkyBlockPlugin extends JavaPlugin {
 
     public static SkyBlockPlugin getInstance() {
         return instance;
+    }
+
+    public static BaseFile getData() {
+        return dataFile;
     }
 
     public static Economy getEconomy() {

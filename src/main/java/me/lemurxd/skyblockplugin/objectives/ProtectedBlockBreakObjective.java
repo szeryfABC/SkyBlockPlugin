@@ -1,10 +1,11 @@
-package me.lemurxd.skyblockplugin.listeners;
+package me.lemurxd.skyblockplugin.objectives;
 
-import me.lemurxd.skyblockplugin.utils.NBTUtil;
 import me.pikamug.quests.Quests;
+import me.pikamug.quests.events.quester.BukkitQuesterPostCompleteQuestEvent;
 import me.pikamug.quests.module.BukkitCustomObjective;
 import me.pikamug.quests.player.Quester;
 import me.pikamug.quests.quests.Quest;
+import me.pikamug.quests.quests.components.Stage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,40 +16,40 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class ProtectedBlockPlaceObjective extends BukkitCustomObjective implements Listener {
+public class ProtectedBlockBreakObjective extends BukkitCustomObjective implements Listener {
 
-    private static final Map<UUID, Set<Location>> placedBlocks = new HashMap<>();
+    private final Map<UUID, Set<Location>> placedBlocks = new HashMap<>();
 
-    private static final String NBT_TAG_KEY = "quest:placed";
-
-    public ProtectedBlockPlaceObjective() {
-        setName("ProtectedBlockPlace");
+    public ProtectedBlockBreakObjective() {
+        Bukkit.getPlayer("asd").getInventory().getItemInMainHand().getAmount();
+        setName("ProtectedBlockBreak");
         setAuthor("lemurxd_");
 
-        setItem("DIRT", (short) 3);
+        setItem("DIAMOND_PICKAXE", (short) 0);
         setShowCount(true);
 
-        addStringPrompt("Block ID", "Wpisz id bloków które gracz ma postawić, możesz oddzielać przecinkiem", null);
-        addStringPrompt("Block Name", "Wpisz nazwę moba wyświetlaną w statusie zadania", null);
+        addStringPrompt("Block ID", "Wpisz id bloków do wykopania (np. STONE,DIAMOND_ORE), oddzielaj przecinkiem", null);
+        addStringPrompt("Display Name", "Nazwa wyświetlana w celu (np. Wykop Kamień)", null);
 
-        setDisplay("Postaw: %count%: %Block Name%");
+        setDisplay("Wykop %Display Name%: %count%");
+    }
+
+    @EventHandler
+    public void onQuestFinish(BukkitQuesterPostCompleteQuestEvent e) {
+        for (Stage stage : e.getQuest().getStages()) {
+            if (!stage.getCustomObjectives().isEmpty()) {
+                placedBlocks.remove(e.getQuester().getPlayer().getUniqueId());
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
-        ItemStack itemInHand = event.getItemInHand();
-
-        addProtectedBlock(player.getUniqueId(), block.getLocation());
-
-        if (NBTUtil.hasTag(itemInHand, NBT_TAG_KEY)) {
-            return;
-        }
 
         Quests quests = (Quests) Bukkit.getPluginManager().getPlugin("Quests");
         if (quests == null) return;
@@ -63,9 +64,8 @@ public class ProtectedBlockPlaceObjective extends BukkitCustomObjective implemen
             String blockIds = (String) dataMap.get("Block ID");
             if (blockIds == null) continue;
 
-            Material material = block.getType();
-            if (itemMatches(material, blockIds)) {
-                incrementObjective(player.getUniqueId(), this, quest, 1);
+            if (itemMatches(block.getType(), blockIds)) {
+                addPlacedBlock(player.getUniqueId(), block.getLocation());
             }
         }
     }
@@ -76,37 +76,41 @@ public class ProtectedBlockPlaceObjective extends BukkitCustomObjective implemen
         Block block = event.getBlock();
         Location loc = block.getLocation();
 
-        if (isProtectedBlock(player.getUniqueId(), loc)) {
+        Quests quests = (Quests) Bukkit.getPluginManager().getPlugin("Quests");
+        if (quests == null) return;
 
-            removeProtectedBlock(player.getUniqueId(), loc);
+        Quester quester = quests.getQuester(player.getUniqueId());
+        if (quester == null) return;
 
-            event.setDropItems(false);
+        for (Quest quest : quester.getCurrentQuests().keySet()) {
+            Map<String, Object> dataMap = getDataForPlayer(player.getUniqueId(), this, quest);
+            if (dataMap == null) continue;
 
-            Collection<ItemStack> drops = block.getDrops(player.getInventory().getItemInMainHand());
+            String blockIds = (String) dataMap.get("Block ID");
+            if (blockIds == null) continue;
 
-            if (drops.isEmpty()) return;
+            if (itemMatches(block.getType(), blockIds)) {
 
-            for (ItemStack drop : drops) {
-                ItemStack taggedDrop = NBTUtil.setString(drop, NBT_TAG_KEY, "true");
-
-                block.getWorld().dropItemNaturally(loc, taggedDrop);
+                if (isPlacedBlock(player.getUniqueId(), loc)) {
+                    removePlacedBlock(player.getUniqueId(), loc);
+                } else {
+                    incrementObjective(player.getUniqueId(), this, quest, 1);
+                }
             }
-
-            event.setExpToDrop(0);
         }
     }
 
 
-    private void addProtectedBlock(UUID uuid, Location loc) {
+    private void addPlacedBlock(UUID uuid, Location loc) {
         placedBlocks.computeIfAbsent(uuid, k -> new HashSet<>()).add(loc);
     }
 
-    private boolean isProtectedBlock(UUID uuid, Location loc) {
+    private boolean isPlacedBlock(UUID uuid, Location loc) {
         if (!placedBlocks.containsKey(uuid)) return false;
         return placedBlocks.get(uuid).contains(loc);
     }
 
-    private void removeProtectedBlock(UUID uuid, Location loc) {
+    private void removePlacedBlock(UUID uuid, Location loc) {
         if (placedBlocks.containsKey(uuid)) {
             Set<Location> locations = placedBlocks.get(uuid);
             locations.remove(loc);
