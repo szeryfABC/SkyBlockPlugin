@@ -91,6 +91,9 @@ public class CustomLore {
         }
         boolean hasAbility = abilityTag != null && !abilityTag.isEmpty();
 
+        String deadMendingTag = NBTUtil.getString(itemToBuild, "deadMending");
+        boolean isDeadMending = deadMendingTag != null && !deadMendingTag.isEmpty();
+
         String[] colors = colorFormat.split(":");
         String c1 = "&" + (colors.length > 0 ? colors[0] : "f");
         String c2 = "&" + (colors.length > 1 ? colors[1] : "7");
@@ -149,8 +152,27 @@ public class CustomLore {
         }
 
         Map<Enchantment, Integer> newEnchants = new HashMap<>();
-        for (Map.Entry<Enchantment, Integer> entry : baseStack.getEnchantments().entrySet()) {
+
+        Map<Enchantment, Integer> enchantsToProcess = new HashMap<>(baseStack.getEnchantments());
+
+        if (itemToBuild.containsEnchantment(Enchantment.MENDING)) {
+            enchantsToProcess.put(Enchantment.MENDING, 1);
+        }
+
+        for (Map.Entry<Enchantment, Integer> entry : enchantsToProcess.entrySet()) {
+            Enchantment ench = entry.getKey();
             int baseLvl = entry.getValue();
+
+            if (ench.equals(Enchantment.MENDING)) {
+                if (isDeadMending) {
+                    newLore.add(color(" " + c2 + "» &c&m" + getPolishEnchantName(ench)));
+                } else {
+                    newEnchants.put(ench, 1);
+                    newLore.add(color(" " + c2 + "» &7" + getPolishEnchantName(ench) + ": " + c2 + "1"));
+                }
+                continue;
+            }
+
             int finalLvl = (int) applyModifier((double) baseLvl, rarityModifierPercent);
             if (finalLvl < 1) finalLvl = 1;
 
@@ -218,6 +240,11 @@ public class CustomLore {
         finalItem = NBTUtil.setString(finalItem, "SkyBlockPlugin", "yes");
         finalItem = NBTUtil.setString(finalItem, "Rarity", currentRarityName);
         finalItem = NBTUtil.setString(finalItem, "ColorFormat", colorFormat);
+
+        if (isDeadMending) {
+            finalItem = NBTUtil.setString(finalItem, "deadMending", deadMendingTag);
+        }
+
         if (hasAbility) {
             int baseCooldown = 30;
             if (nbtMap != null && nbtMap.containsKey("Cooldown")) {
@@ -505,5 +532,17 @@ public class CustomLore {
             }
         }.runTaskTimer(SkyBlockPlugin.getInstance(), 0L, 5L);
     }
+
+    public static void forceReroll(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item == null || item.getType() == Material.AIR) return;
+
+        item = NBTUtil.remove(item, "Rarity");
+
+        player.getInventory().setItemInMainHand(item);
+
+        build(item, player, player.getInventory().getHeldItemSlot());
+    }
+
 
 }

@@ -74,4 +74,17 @@ public class NBTUtil {
         return container.has(namespacedKey, PersistentDataType.STRING)
                 || container.has(namespacedKey, PersistentDataType.INTEGER);
     }
+
+    public static ItemStack remove(ItemStack item, String key) {
+        if (item == null || item.getItemMeta() == null) return item;
+
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        NamespacedKey namespacedKey = new NamespacedKey(SkyBlockPlugin.getInstance(), key);
+
+        container.remove(namespacedKey);
+
+        item.setItemMeta(meta);
+        return item;
+    }
 }

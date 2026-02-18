@@ -18,6 +18,4 @@ public class PlayerY {
             }
         }, 0L, 100L);
     }
-
-
 }

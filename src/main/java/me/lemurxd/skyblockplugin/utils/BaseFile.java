@@ -14,7 +14,6 @@ public class BaseFile {
     private final File file;
     private YamlConfiguration config;
 
-    // Cache w pamięci RAM
     private final Map<String, IslandData> cache = new HashMap<>();
 
     public BaseFile(JavaPlugin plugin) {

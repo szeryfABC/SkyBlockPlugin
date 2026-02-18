@@ -10,6 +10,8 @@ import me.lemurxd.skyblockplugin.database.DatabaseManager;
 import me.lemurxd.skyblockplugin.database.SkyBlockUserDatabase;
 import me.lemurxd.skyblockplugin.database.StoneGeneratorDatabase;
 import me.lemurxd.skyblockplugin.enums.Config;
+import me.lemurxd.skyblockplugin.gui.HellSmithMenu;
+import me.lemurxd.skyblockplugin.gui.NetherMenu;
 import me.lemurxd.skyblockplugin.listeners.*;
 import me.lemurxd.skyblockplugin.nether.NetherAcces;
 import me.lemurxd.skyblockplugin.objectives.*;
@@ -96,7 +98,9 @@ public class SkyBlockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ChatFilter(), getInstance());
         Bukkit.getPluginManager().registerEvents(new SlotChange(), getInstance());
         Bukkit.getPluginManager().registerEvents(new NetherAcces(), getInstance());
-
+        Bukkit.getPluginManager().registerEvents(new HellSmithMenu(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new NpcSpawn(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new NetherMenu(), getInstance());
 
         if (getServer().getPluginManager().getPlugin("Quests") instanceof Quests) {
             getLogger().info("Znaleziono Quests! Rejestrowanie celu MythicMobs...");

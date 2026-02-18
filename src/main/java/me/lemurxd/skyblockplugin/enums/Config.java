@@ -47,6 +47,11 @@ public enum Config {
     MESSAGES_DROP_MAX_LEVEL("messages.drop.max_level", "<prefix>&cOsiągnąłeś już maksymalny poziom!", true),
     MESSAGES_DROP_LEVELUP("messages.drop.levelup", "<prefix>Ulepszyłeś drop na <level> poziom!", true),
     MESSAGES_GENERATOR_BREAK_SNEAK_INFO("messages.generator.sneak_when_break", "<prefix>Musisz kucać, aby podnieść stoniarkę!", true),
+    MESSAGES_BLACKSMITH_SUCCESS("messages.blacksmith.success", "<prefix>&aSukces! Operacja zakończona pomyślnie.", true),
+    MESSAGES_BLACKSMITH_NO_ITEM("messages.blacksmith.no_item", "<prefix>&cMusisz trzymać przedmiot w ręce!", true),
+    MESSAGES_BLACKSMITH_ALREADY_MENDING("messages.blacksmith.already_mending", "<prefix>&cTen przedmiot ma już Mending!", true),
+    MESSAGES_BLACKSMITH_CANNOT_ENCHANT("messages.blacksmith.cannot_enchant", "<prefix>&cTego przedmiotu nie można zakląć!", true),
+    MESSAGES_BLACKSMITH_NO_FUNDS("messages.blacksmith.no_funds", "<prefix>&cNie stać Cię na to! Brakuje pieniędzy lub przedmiotów.", true),
 
     //DROP
     DROP_LEVELS("drop.levels_cost", Arrays.asList("5000", "20000", "50000", "100000")),
@@ -84,6 +89,53 @@ public enum Config {
 
     DROP_POLISH_NAMES("drop.polish_names", Arrays.asList("STONE:&7Kamień", "COBBLESTONE:&7Bruk (Brak SilkTouch)", "COAL:&8Węgiel", "IRON_INGOT:&7Sztabka Żelaza", "COPPER_INGOT:&6Sztabka Miedzi", "GOLD_INGOT:&eSztabka Złota", "DIAMOND:&bDiament", "EMERALD:&aSzmaragd", "NETHERITE_SCRAP:&5Odłamek Netheritu"), true),
 
+
+    // --- NETHER MENU ---
+    NETHER_MENU_TITLE("nether.menu.title", "&4&lPiekielny Rynek", true),
+    NETHER_MENU_ROWS("nether.menu.rows", 3),
+    NETHER_MENU_FILL_ITEM("nether.menu.fill", "BLACK_STAINED_GLASS_PANE"),
+
+    // Domek Kowala
+    NETHER_KOWAL_SLOT("nether.menu.kowal.slot", 11),
+    NETHER_KOWAL_MATERIAL("nether.menu.kowal.material", "ANVIL"),
+    NETHER_KOWAL_COST("nether.menu.kowal.cost", 2500000),
+    NETHER_KOWAL_NAME("nether.menu.kowal.name", "&6&lSiedziba Piekielnego Kowala", true),
+    NETHER_KOWAL_LORE("nether.menu.kowal.lore", Arrays.asList(
+            "&7Odblokuj dostęp do legendarnego",
+            "&7rzemieślnika z czeluści Netheru.",
+            "",
+            "&7Umożliwia:",
+            " &c» &fNaprawianie przedmiotów (Mending)",
+            " &c» &fLosowanie rzadkości (Reroll)",
+            "",
+            "&cKoszt: &6$<cost>",
+            "&eKliknij, aby zakupić!"
+    ), true),
+    NETHER_KOWAL_LORE_BOUGHT("nether.menu.kowal.lore_bought", Arrays.asList(
+            "&a&lZAKUPIONE",
+            "&7Już posiadasz dostęp do tego budynku."
+    ), true),
+
+    // Hordy
+    NETHER_HORDY_SLOT("nether.menu.hordy.slot", 15),
+    NETHER_HORDY_MATERIAL("nether.menu.hordy.material", "NETHERRACK"),
+    NETHER_HORDY_COST("nether.menu.hordy.cost", 5000000),
+    NETHER_HORDY_NAME("nether.menu.hordy.name", "&c&lPiekielne Hordy", true),
+    NETHER_HORDY_LORE("nether.menu.hordy.lore", Arrays.asList(
+            "&7Odblokuj dostęp do areny,",
+            "&7na której zmierzysz się z falami",
+            "&7piekielnych potworów.",
+            "",
+            "&cKoszt: &6$<cost>",
+            "&eKliknij, aby zakupić!"
+    ), true),
+    NETHER_HORDY_LORE_BOUGHT("nether.menu.hordy.lore_bought", Arrays.asList(
+            "&a&lZAKUPIONE",
+            "&7Już posiadasz dostęp do areny."
+    ), true),
+
+    NETHER_MSG_BOUGHT("nether.msg.bought", "&aPomyślnie zakupiono dostęp do: <feature>!", true),
+    NETHER_MSG_ALREADY_OWNED("nether.msg.already_owned", "&cJuż posiadasz ten element!", true),
 
     //GAME SPAWN
     SAFE_SPAWN_ENABLED("safe_spawn.enabled", false),
@@ -125,6 +177,68 @@ public enum Config {
     RARITY_MODIFIER("custom_items.rarity.rarity_modifiers", Arrays.asList("ZEPSUTY:-100", "USZKODZONY:-50", "ZWYKŁY:0", "RZADKI:+25", "EPICKI:+50", "LEGENDARNY:+125", "7 BOSKI 7:+250")),
     RARITY_DEBUG("custom_items.rarity.debug", false),
 
+    // --- PIEKIELNY KOWAL (HELL BLACKSMITH) ---
+    BLACKSMITH_GUI_TITLE("blacksmith.gui.title", "&4&lPiekielna Kuźnia", true),
+    BLACKSMITH_GUI_ROWS("blacksmith.gui.rows", 3),
+    BLACKSMITH_GUI_FILL_ITEM("blacksmith.gui.fill_item", "RED_STAINED_GLASS_PANE"),
+
+    // Mending
+    BLACKSMITH_MENDING_SLOT("blacksmith.mending.slot", 11),
+    BLACKSMITH_MENDING_MATERIAL("blacksmith.mending.material", "ENCHANTED_BOOK"),
+    BLACKSMITH_MENDING_NAME("blacksmith.mending.name", "&e&lNalożenie Mendingu", true),
+    BLACKSMITH_MENDING_LORE("blacksmith.mending.lore", Arrays.asList(
+            "&7Spróbuj zakląć trzymany przedmiot",
+            "&7starożytnym zaklęciem &6Mending&7.",
+            "",
+            "&7Szansa: &a100%",
+            "&cWymagania:",
+            "<cost>",
+            "",
+            "&eKliknij, aby zakupić!"
+    ), true),
+    BLACKSMITH_MENDING_COST_MONEY("blacksmith.mending.cost.money", 10000),
+    BLACKSMITH_MENDING_COST_ITEMS("blacksmith.mending.cost.items", Arrays.asList("mitycznyDiament:5", "magicznyOrb:1")),
+
+    // Reroll (Odrodzenie)
+    BLACKSMITH_REROLL_SLOT("blacksmith.reroll.slot", 15),
+    BLACKSMITH_REROLL_MATERIAL("blacksmith.reroll.material", "NETHER_STAR"),
+    BLACKSMITH_REROLL_NAME("blacksmith.reroll.name", "&b&lOdrodzenie Przedmiotu", true),
+    BLACKSMITH_REROLL_LORE("blacksmith.reroll.lore", Arrays.asList(
+            "&7Przekuj swój przedmiot na nowo,",
+            "&7losując jego &nrzadkość&7.",
+            "",
+            "&cWymagania:",
+            "<cost>",
+            "",
+            "&eKliknij, aby przelosować!"
+    ), true),
+    BLACKSMITH_REROLL_COST_MONEY("blacksmith.reroll.cost.money", 5000),
+    BLACKSMITH_REROLL_COST_ITEMS("blacksmith.reroll.cost.items", Arrays.asList("mitycznyDiament:2")),
+
+    // Crafting (Wytwarzanie - Coming Soon)
+    BLACKSMITH_CRAFTING_SLOT("blacksmith.crafting.slot", 22), // Środek na dole
+    BLACKSMITH_CRAFTING_MATERIAL("blacksmith.crafting.material", "ANVIL"),
+    BLACKSMITH_CRAFTING_NAME("blacksmith.crafting.name", "&6&lWytwarzanie (Wkrótce)", true),
+    BLACKSMITH_CRAFTING_LORE("blacksmith.crafting.lore", Arrays.asList(
+            "&7W tym miejscu wkrótce będziesz mógł",
+            "&7wytwarzać legendarne przedmioty.",
+            "",
+            "&cTa funkcja jest niedostępna."
+    ), true),
+
+
+    //NPC
+    NPCS_KOWAL_ENABLED("npcs.kowal.enabled", true),
+    NPCS_KOWAL_MOBNAME("npcs.kowal.mob_name", "kowalNPC"),
+    NPCS_KOWAL_CORDS_X("npcs.kowal.koordynaty.x", 0),
+    NPCS_KOWAL_CORDS_Y("npcs.kowal.koordynaty.y", 0),
+    NPCS_KOWAL_CORDS_Z("npcs.kowal.koordynaty.z", 0),
+
+    NPCS_HORDY_ENABLED("npcs.hordy.enabled", true),
+    NPCS_HORDY_MOBNAME("npcs.hordy.mob_name", "hordyNPC"),
+    NPCS_HORDY_CORDS_X("npcs.hordy.koordynaty.x", 0),
+    NPCS_HORDY_CORDS_Y("npcs.hordy.koordynaty.y", 0),
+    NPCS_HORDY_CORDS_Z("npcs.hordy.koordynaty.z", 0),
 
     CHAT_COOLDOWN("chat.cooldown", 2000),
     CENZURA("cenzura", Arrays.asList("chuj","chuja", "chujek", "chuju", "chujem", "chujnia",
