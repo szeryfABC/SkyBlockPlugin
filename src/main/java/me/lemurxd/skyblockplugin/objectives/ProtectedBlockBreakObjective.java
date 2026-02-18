@@ -24,7 +24,6 @@ public class ProtectedBlockBreakObjective extends BukkitCustomObjective implemen
     private final Map<UUID, Set<Location>> placedBlocks = new HashMap<>();
 
     public ProtectedBlockBreakObjective() {
-        Bukkit.getPlayer("asd").getInventory().getItemInMainHand().getAmount();
         setName("ProtectedBlockBreak");
         setAuthor("lemurxd_");
 
