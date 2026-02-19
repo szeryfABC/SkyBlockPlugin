@@ -1,24 +1,29 @@
 package me.lemurxd.skyblockplugin.gui;
 
+import io.lumine.mythic.bukkit.MythicBukkit;
 import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.enums.Config;
-import me.lemurxd.skyblockplugin.utils.BaseFile;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import world.bentobox.bentobox.BentoBox;
+import world.bentobox.bentobox.api.user.User;
+import world.bentobox.bentobox.database.objects.Island;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class NetherMenu implements Listener {
 
@@ -61,6 +66,33 @@ public class NetherMenu implements Listener {
     }
 
     @EventHandler
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+
+            Block clickedBlock = event.getClickedBlock();
+
+            if (clickedBlock != null && clickedBlock.getType() == Material.OBSIDIAN && event.getPlayer().getWorld().getEnvironment().equals(World.Environment.NETHER)) {
+
+                Player player = event.getPlayer();
+                Location blockLocation = clickedBlock.getLocation();
+
+                Optional<Island> islandOpt = BentoBox.getInstance().getIslands().getIslandAt(blockLocation);
+
+                if (islandOpt.isPresent()) {
+                    Island island = islandOpt.get();
+
+                    if (island.getMemberSet().contains(player.getUniqueId())) {
+                        open(event.getPlayer());
+                    } else {
+                        player.sendMessage("§cNie możesz tego zrobić! To nie jest twoja wyspa.");
+                        event.setCancelled(true);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onClick(InventoryClickEvent e) {
         if (!e.getView().getTitle().equals(Config.NETHER_MENU_TITLE.getString())) return;
         e.setCancelled(true);
@@ -83,7 +115,10 @@ public class NetherMenu implements Listener {
                 p.sendMessage(Config.NETHER_MSG_BOUGHT.getString().replace("<feature>", "Siedziba Kowala"));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
-                //TODO: Tutaj żeby działało
+                Location location = BentoBox.getInstance().getIslandsManager().getIsland(Bukkit.getWorld("bskyblock_world_nether"), User.getInstance(((Player) e.getWhoClicked()).getPlayer().getUniqueId())).getCenter();
+                location.add(Config.NPCS_KOWAL_CORDS_X.getInt(), Config.NPCS_KOWAL_CORDS_Y.getInt(), Config.NPCS_KOWAL_CORDS_Z.getInt());
+
+                MythicBukkit.inst().getMobManager().spawnMob(Config.NPCS_KOWAL_MOBNAME.getString(), location);
 
                 p.closeInventory();
             }
@@ -102,7 +137,10 @@ public class NetherMenu implements Listener {
                 p.sendMessage(Config.NETHER_MSG_BOUGHT.getString().replace("<feature>", "Piekielne Hordy"));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
-                //TODO: Tutaj żeby działało
+                Location location = BentoBox.getInstance().getIslandsManager().getIsland(Bukkit.getWorld("bskyblock_world_nether"), User.getInstance(((Player) e.getWhoClicked()).getPlayer().getUniqueId())).getCenter();
+                location.add(Config.NPCS_HORDY_CORDS_X.getInt(), Config.NPCS_HORDY_CORDS_Y.getInt(), Config.NPCS_HORDY_CORDS_Z.getInt());
+
+                MythicBukkit.inst().getMobManager().spawnMob(Config.NPCS_HORDY_MOBNAME.getString(), location);
 
                 p.closeInventory();
             }

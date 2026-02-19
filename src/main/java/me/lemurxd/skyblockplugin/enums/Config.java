@@ -137,6 +137,19 @@ public enum Config {
     NETHER_MSG_BOUGHT("nether.msg.bought", "&aPomyślnie zakupiono dostęp do: <feature>!", true),
     NETHER_MSG_ALREADY_OWNED("nether.msg.already_owned", "&cJuż posiadasz ten element!", true),
 
+    HORDES_GUI_TITLE("hordes.gui.title", "&4&lPiekielne Hordy", true),
+    HORDES_GUI_ROWS("hordes.gui.rows", 3),
+    HORDES_GUI_FILL_ITEM("hordes.gui.fill_item", "BLACK_STAINED_GLASS_PANE"),
+    HORDES_CONNECT_SLOT("hordes.gui.connect.slot", 13),
+    HORDES_CONNECT_MATERIAL("hordes.gui.connect.material", "NETHER_STAR"),
+    HORDES_CONNECT_NAME("hordes.gui.connect.name", "&c&lRozpocznij Walkę z Hordami", true),
+    HORDES_CONNECT_LORE("hordes.gui.connect.lore", Arrays.asList(
+            "&7Kliknij tutaj, aby przenieść się",
+            "&7na arenę Piekielnych Hord!",
+            "",
+            "&eKliknij lewym, aby dołączyć!"
+    ), true),
+
     //GAME SPAWN
     SAFE_SPAWN_ENABLED("safe_spawn.enabled", false),
     SAFE_SPAWN_WORLD("safe.spawn.world", "spawn"),
@@ -225,6 +238,8 @@ public enum Config {
             "",
             "&cTa funkcja jest niedostępna."
     ), true),
+
+    CRAFTING_LIST("crafting.list", Arrays.asList("wzmocnioneorboweostrze:1 | orb:10,money:50000,orboweostrze:1")),
 
 
     //NPC

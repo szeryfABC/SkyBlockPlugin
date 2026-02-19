@@ -322,7 +322,7 @@ public class CustomLore {
         }
     }
 
-    static String getPolishAttributeName(Attribute attr) {
+    public static String getPolishAttributeName(Attribute attr) {
         if (attr == Attribute.ATTACK_DAMAGE) return "Obrażenia";
         if (attr == Attribute.ATTACK_SPEED) return "Prędkość Ataku";
         if (attr == Attribute.MAX_HEALTH) return "Zdrowie";
@@ -342,7 +342,7 @@ public class CustomLore {
         return Character.toUpperCase(name.charAt(0)) + name.substring(1);
     }
 
-    static String getPolishEnchantName(Enchantment ench) {
+    public  static String getPolishEnchantName(Enchantment ench) {
         String key = ench.getKey().getKey().toLowerCase();
 
         switch (key) {

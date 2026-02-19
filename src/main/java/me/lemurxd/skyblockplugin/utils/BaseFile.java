@@ -107,6 +107,12 @@ public class BaseFile {
         }
     }
 
+    public void deleteIsland(String uuid) {
+        cache.remove(uuid);
+        config.set("islands." + uuid, null);
+        save();
+    }
+
     private static class IslandData {
         boolean nether;
         boolean end;

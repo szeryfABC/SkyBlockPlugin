@@ -25,7 +25,7 @@ public class HellSmithMenu implements Listener {
 
     private Economy economy = SkyBlockPlugin.getEconomy();
 
-    public void open(Player player) {
+    public static void open(Player player) {
         int rows = Config.BLACKSMITH_GUI_ROWS.getInt();
         String title = Config.BLACKSMITH_GUI_TITLE.getString();
         Inventory inv = Bukkit.createInventory(null, rows * 9, title);
@@ -83,6 +83,7 @@ public class HellSmithMenu implements Listener {
             handleReroll(p);
         }
         else if (slot == Config.BLACKSMITH_CRAFTING_SLOT.getInt()) {
+            CraftingMenu.open(p);
         }
     }
 
@@ -165,7 +166,7 @@ public class HellSmithMenu implements Listener {
         return true;
     }
 
-    private List<String> parseLoreWithCost(List<String> originalLore, int money, List<String> items) {
+    private static List<String> parseLoreWithCost(List<String> originalLore, int money, List<String> items) {
         List<String> newLore = new ArrayList<>();
         for (String line : originalLore) {
             if (line.contains("<cost>")) {
@@ -176,7 +177,7 @@ public class HellSmithMenu implements Listener {
                     String[] split = itemStr.split(":");
                     String id = split[0];
                     String amount = split[1];
-                    String displayName = getMythicName(id); // Pobiera nazwę z MM
+                    String displayName = getMythicName(id);
                     newLore.add("&7- &f" + amount + "x " + displayName);
                 }
             } else {
@@ -186,7 +187,7 @@ public class HellSmithMenu implements Listener {
         return newLore;
     }
 
-    private String getMythicName(String internalName) {
+    private static String getMythicName(String internalName) {
         try {
             Optional<MythicItem> item = MythicBukkit.inst().getItemManager().getItem(internalName);
             if (item.isPresent()) {
@@ -229,7 +230,7 @@ public class HellSmithMenu implements Listener {
         }
     }
 
-    private ItemStack createGuiItem(Material material, String name, List<String> lore) {
+    private static ItemStack createGuiItem(Material material, String name, List<String> lore) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(name.replace("&", "§"));

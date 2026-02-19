@@ -157,6 +157,20 @@ public class DatabaseManager {
 
                     player.updateInventory();
 
+                    CompletableFuture.runAsync(() -> {
+                        String deleteSql = "DELETE FROM player_inventories WHERE uuid = ?";
+                        try (Connection conn = dataSource.getConnection();
+                             PreparedStatement ps = conn.prepareStatement(deleteSql)) {
+
+                            ps.setString(1, uuid.toString());
+                            ps.executeUpdate();
+
+                        } catch (SQLException e) {
+                            plugin.getLogger().severe("Błąd podczas usuwania ekwipunku z bazy dla " + player.getName());
+                            e.printStackTrace();
+                        }
+                    });
+
                 } catch (IOException e) {
                     plugin.getLogger().severe("Błąd deserializacji ekwipunku dla " + player.getName());
                     e.printStackTrace();

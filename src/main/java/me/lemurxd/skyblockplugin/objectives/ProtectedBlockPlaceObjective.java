@@ -11,11 +11,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -124,6 +127,34 @@ public class ProtectedBlockPlaceObjective extends BukkitCustomObjective implemen
 
             if (locations.isEmpty()) {
                 placedBlocks.remove(uuid);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        handlePistonMove(event.getBlocks(), event.getDirection());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        handlePistonMove(event.getBlocks(), event.getDirection());
+    }
+
+    private void handlePistonMove(List<Block> blocks, BlockFace direction) {
+        if (blocks.isEmpty()) return;
+
+        for (Block block : blocks) {
+            Location oldLoc = block.getLocation();
+            Location newLoc = oldLoc.clone().add(direction.getModX(), direction.getModY(), direction.getModZ());
+
+            for (Map.Entry<UUID, Set<Location>> entry : placedBlocks.entrySet()) {
+                Set<Location> playerBlocks = entry.getValue();
+
+                if (playerBlocks.contains(oldLoc)) {
+                    playerBlocks.remove(oldLoc);
+                    playerBlocks.add(newLoc);
+                }
             }
         }
     }

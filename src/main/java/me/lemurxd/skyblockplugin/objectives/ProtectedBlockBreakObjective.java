@@ -10,18 +10,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.*;
 
 public class ProtectedBlockBreakObjective extends BukkitCustomObjective implements Listener {
 
-    private final Map<UUID, Set<Location>> placedBlocks = new HashMap<>();
+    private final Map<Location, Material> placedBlocksCache = new HashMap<>();
 
     public ProtectedBlockBreakObjective() {
         setName("ProtectedBlockBreak");
@@ -36,37 +39,10 @@ public class ProtectedBlockBreakObjective extends BukkitCustomObjective implemen
         setDisplay("Wykop %Display Name%: %count%");
     }
 
-    @EventHandler
-    public void onQuestFinish(BukkitQuesterPostCompleteQuestEvent e) {
-        for (Stage stage : e.getQuest().getStages()) {
-            if (!stage.getCustomObjectives().isEmpty()) {
-                placedBlocks.remove(e.getQuester().getPlayer().getUniqueId());
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        Player player = event.getPlayer();
         Block block = event.getBlockPlaced();
-
-        Quests quests = (Quests) Bukkit.getPluginManager().getPlugin("Quests");
-        if (quests == null) return;
-
-        Quester quester = quests.getQuester(player.getUniqueId());
-        if (quester == null) return;
-
-        for (Quest quest : quester.getCurrentQuests().keySet()) {
-            Map<String, Object> dataMap = getDataForPlayer(player.getUniqueId(), this, quest);
-            if (dataMap == null) continue;
-
-            String blockIds = (String) dataMap.get("Block ID");
-            if (blockIds == null) continue;
-
-            if (itemMatches(block.getType(), blockIds)) {
-                addPlacedBlock(player.getUniqueId(), block.getLocation());
-            }
-        }
+        placedBlocksCache.put(block.getLocation(), block.getType());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -75,6 +51,16 @@ public class ProtectedBlockBreakObjective extends BukkitCustomObjective implemen
         Block block = event.getBlock();
         Location loc = block.getLocation();
 
+        boolean wasPlaced = false;
+        if (placedBlocksCache.containsKey(loc)) {
+            if (placedBlocksCache.get(loc) == block.getType()) {
+                wasPlaced = true;
+            }
+            placedBlocksCache.remove(loc);
+        }
+
+        if (wasPlaced) return;
+
         Quests quests = (Quests) Bukkit.getPluginManager().getPlugin("Quests");
         if (quests == null) return;
 
@@ -89,36 +75,46 @@ public class ProtectedBlockBreakObjective extends BukkitCustomObjective implemen
             if (blockIds == null) continue;
 
             if (itemMatches(block.getType(), blockIds)) {
-
-                if (isPlacedBlock(player.getUniqueId(), loc)) {
-                    removePlacedBlock(player.getUniqueId(), loc);
-                } else {
-                    incrementObjective(player.getUniqueId(), this, quest, 1);
-                }
+                incrementObjective(player.getUniqueId(), this, quest, 1);
             }
         }
     }
 
 
-    private void addPlacedBlock(UUID uuid, Location loc) {
-        placedBlocks.computeIfAbsent(uuid, k -> new HashSet<>()).add(loc);
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        handlePistonMove(event.getBlocks(), event.getDirection());
     }
 
-    private boolean isPlacedBlock(UUID uuid, Location loc) {
-        if (!placedBlocks.containsKey(uuid)) return false;
-        return placedBlocks.get(uuid).contains(loc);
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        handlePistonMove(event.getBlocks(), event.getDirection());
     }
 
-    private void removePlacedBlock(UUID uuid, Location loc) {
-        if (placedBlocks.containsKey(uuid)) {
-            Set<Location> locations = placedBlocks.get(uuid);
-            locations.remove(loc);
+    private void handlePistonMove(List<Block> blocks, BlockFace direction) {
+        if (blocks.isEmpty()) return;
 
-            if (locations.isEmpty()) {
-                placedBlocks.remove(uuid);
+        Map<Location, Material> toAdd = new HashMap<>();
+        List<Location> toRemove = new ArrayList<>();
+
+        for (Block block : blocks) {
+            Location oldLoc = block.getLocation();
+
+            if (placedBlocksCache.containsKey(oldLoc)) {
+                Material material = placedBlocksCache.get(oldLoc);
+                toRemove.add(oldLoc);
+
+                Location newLoc = oldLoc.clone().add(direction.getModX(), direction.getModY(), direction.getModZ());
+                toAdd.put(newLoc, material);
             }
         }
+
+        for (Location loc : toRemove) {
+            placedBlocksCache.remove(loc);
+        }
+        placedBlocksCache.putAll(toAdd);
     }
+
 
     private boolean itemMatches(Material material, String blockIds) {
         String[] split = blockIds.split(",");

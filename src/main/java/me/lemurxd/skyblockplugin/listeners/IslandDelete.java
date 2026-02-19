@@ -20,6 +20,7 @@ public class IslandDelete  implements Listener{
 
         Bukkit.getScheduler().runTaskAsynchronously(SkyBlockPlugin.getInstance(), () -> {
             SkyBlockPlugin.getDatabase().deleteGeneratorsForIsland(islandId);
+            SkyBlockPlugin.getData().deleteIsland(islandId);
         });
     }
 }
