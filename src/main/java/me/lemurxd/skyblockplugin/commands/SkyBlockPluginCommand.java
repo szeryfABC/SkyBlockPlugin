@@ -82,7 +82,7 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
         if (args.length < 2) {
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cPoprawne użycie:");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give stoniarka [gracz]");
-            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give orb [gracz]");
+            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp give orb [gracz] [ilosc]");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp drop set <gracz> <poziom>");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp orb reset <gracz>");
             sender.sendMessage(Config.MAIN_PREFIX.getString() + " §7/sbp devmode [item]");
@@ -116,22 +116,40 @@ public class SkyBlockPluginCommand implements CommandExecutor, TabCompleter {
 
             if (args[1].equalsIgnoreCase("orb")) {
                 Player target;
-                if (args.length == 3) {
+                int amount = 1;
+
+                if (args.length >= 3) {
                     target = Bukkit.getPlayer(args[2]);
                     if (target == null) {
                         sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cGracz " + args[2] + " jest offline!");
                         return true;
                     }
+
+                    if (args.length >= 4) {
+                        try {
+                            amount = Integer.parseInt(args[3]);
+                            if (amount < 1) amount = 1;
+                        } catch (NumberFormatException e) {
+                            sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cPodana ilość '" + args[3] + "' nie jest liczbą!");
+                            return true;
+                        }
+                    }
                 } else {
                     if (!(sender instanceof Player)) {
-                        sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cKonsola musi podać nick gracza! /sbp orb give <nick>");
+                        sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cKonsola musi podać nick gracza! /sbp give orb <nick> [ilość]");
                         return true;
                     }
                     target = (Player) sender;
                 }
 
-                SafeGive.giv(io.lumine.mythic.bukkit.MythicBukkit.inst().getItemManager().getItemStack(Config.ORB_ITEM_NAME.getString()), target);
-                sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie dano Orba graczowi " + target.getName());
+                ItemStack orbItem = io.lumine.mythic.bukkit.MythicBukkit.inst().getItemManager().getItemStack(Config.ORB_ITEM_NAME.getString());
+                if (orbItem != null) {
+                    orbItem.setAmount(amount);
+                    SafeGive.giv(orbItem, target);
+                    sender.sendMessage(Config.MAIN_PREFIX.getString() + " §aPomyślnie dano Orba (x" + amount + ") graczowi " + target.getName());
+                } else {
+                    sender.sendMessage(Config.MAIN_PREFIX.getString() + " §cBłąd: Nie znaleziono przedmiotu z MythicMobs o nazwie " + Config.ORB_ITEM_NAME.getString());
+                }
                 return true;
             }
 

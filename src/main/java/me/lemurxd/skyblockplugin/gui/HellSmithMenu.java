@@ -4,6 +4,10 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.items.MythicItem;
 import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.enums.Config;
+import me.lemurxd.skyblockplugin.utils.NBTUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,9 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class HellSmithMenu implements Listener {
+import static me.lemurxd.skyblockplugin.lore.CustomLore.build;
 
-    private Economy economy = SkyBlockPlugin.getEconomy();
+public class HellSmithMenu implements Listener {
 
     public static void open(Player player) {
         int rows = Config.BLACKSMITH_GUI_ROWS.getInt();
@@ -39,6 +43,25 @@ public class HellSmithMenu implements Listener {
             inv.setItem(i, filler);
         }
 
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        int rerolls = getRerollCount(hand);
+
+        int moneyMultiplier = rerolls + 1;
+        int itemMultiplier = Math.min(rerolls + 1, 20);
+
+        int baseMoney = Config.BLACKSMITH_REROLL_COST_MONEY.getInt();
+        int finalMoney = baseMoney * moneyMultiplier;
+
+        List<String> baseItems = Config.BLACKSMITH_REROLL_COST_ITEMS.getStringList();
+        List<String> finalItems = new ArrayList<>();
+
+        for (String req : baseItems) {
+            String[] split = req.split(":");
+            String id = split[0];
+            int amount = Integer.parseInt(split[1]);
+            finalItems.add(id + ":" + (amount * itemMultiplier));
+        }
+
         ItemStack mendingIcon = createGuiItem(
                 Material.valueOf(Config.BLACKSMITH_MENDING_MATERIAL.getString()),
                 Config.BLACKSMITH_MENDING_NAME.getString(),
@@ -52,8 +75,8 @@ public class HellSmithMenu implements Listener {
                 Material.valueOf(Config.BLACKSMITH_REROLL_MATERIAL.getString()),
                 Config.BLACKSMITH_REROLL_NAME.getString(),
                 parseLoreWithCost(Config.BLACKSMITH_REROLL_LORE.getStringList(),
-                        Config.BLACKSMITH_REROLL_COST_MONEY.getInt(),
-                        Config.BLACKSMITH_REROLL_COST_ITEMS.getStringList())
+                        finalMoney,
+                        finalItems)
         );
         inv.setItem(Config.BLACKSMITH_REROLL_SLOT.getInt(), rerollIcon);
 
@@ -117,20 +140,39 @@ public class HellSmithMenu implements Listener {
     private void handleReroll(Player p) {
         ItemStack hand = p.getInventory().getItemInMainHand();
 
-        if (hand == null || hand.getType() == Material.AIR) {
+        if (hand == null || hand.getType() == Material.AIR || !NBTUtil.hasTag(hand, "SkyBlockPlugin")) {
             p.sendMessage(Config.MESSAGES_BLACKSMITH_NO_ITEM.getString());
             return;
         }
 
-        int costMoney = Config.BLACKSMITH_REROLL_COST_MONEY.getInt();
-        List<String> costItems = Config.BLACKSMITH_REROLL_COST_ITEMS.getStringList();
+        int rerolls = getRerollCount(hand);
+        int moneyMultiplier = rerolls + 1;
+        int itemMultiplier = Math.min(rerolls + 1, 20);
 
-        if (processPayment(p, costMoney, costItems)) {
-            ItemMeta meta = hand.getItemMeta();
-            List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
-            lore.add("§7§oPrzekuto w Piekielnej Kuźni...");
-            meta.setLore(lore);
-            hand.setItemMeta(meta);
+        double baseMoney = Config.BLACKSMITH_REROLL_COST_MONEY.getInt();
+        double finalMoney = baseMoney * moneyMultiplier;
+
+        List<String> baseItems = Config.BLACKSMITH_REROLL_COST_ITEMS.getStringList();
+        List<String> finalItems = new ArrayList<>();
+
+        for (String req : baseItems) {
+            String[] split = req.split(":");
+            String id = split[0];
+            int amount = Integer.parseInt(split[1]);
+            finalItems.add(id + ":" + (amount * itemMultiplier));
+        }
+
+        if (processPayment(p, finalMoney, finalItems)) {
+
+            hand = NBTUtil.remove(hand, "Rarity");
+
+            hand = NBTUtil.setInt(hand, "Rerolls", rerolls + 1);
+
+            p.getInventory().setItemInMainHand(hand);
+
+            build(hand, p, p.getInventory().getHeldItemSlot());
+
+            p.closeInventory();
 
             p.sendMessage(Config.MESSAGES_BLACKSMITH_SUCCESS.getString());
         } else {
@@ -138,9 +180,20 @@ public class HellSmithMenu implements Listener {
         }
     }
 
+    private static int getRerollCount(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return 0;
+        try {
+            Integer val = NBTUtil.getInt(item, "Rerolls");
+            if (val != null) {
+                return val;
+            }
+        } catch (Exception ignored) {}
+        return 0;
+    }
+
 
     private boolean processPayment(Player p, double money, List<String> items) {
-        if (economy != null && economy.getBalance(p) < money) {
+        if (SkyBlockPlugin.getEconomy() != null && SkyBlockPlugin.getEconomy().getBalance(p) < money) {
             return false;
         }
 
@@ -154,8 +207,8 @@ public class HellSmithMenu implements Listener {
             }
         }
 
-        if (economy != null && money > 0) {
-            economy.withdrawPlayer(p, money);
+        if (SkyBlockPlugin.getEconomy() != null && money > 0) {
+            SkyBlockPlugin.getEconomy().withdrawPlayer(p, money);
         }
 
         for (String req : items) {
@@ -191,7 +244,14 @@ public class HellSmithMenu implements Listener {
         try {
             Optional<MythicItem> item = MythicBukkit.inst().getItemManager().getItem(internalName);
             if (item.isPresent()) {
-                return item.get().getDisplayName();
+                String rawName = item.get().getDisplayName();
+
+                Component component = MiniMessage.miniMessage().deserialize(rawName);
+                return LegacyComponentSerializer.builder()
+                        .hexColors()
+                        .useUnusualXRepeatedCharacterHexFormat()
+                        .build()
+                        .serialize(component);
             }
         } catch (Exception e) {
             e.printStackTrace();

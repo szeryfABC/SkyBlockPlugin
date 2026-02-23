@@ -105,6 +105,8 @@ public class SkyBlockPlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new NetherMenu(), getInstance());
         Bukkit.getPluginManager().registerEvents(new HellHordesMenu(), getInstance());
         Bukkit.getPluginManager().registerEvents(new CraftingMenu(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new MythicItemProtection(), getInstance());
+        Bukkit.getPluginManager().registerEvents(new Death(), getInstance());
 
         if (getServer().getPluginManager().getPlugin("Quests") instanceof Quests) {
             getLogger().info("Znaleziono Quests! Rejestrowanie custom objectives...");

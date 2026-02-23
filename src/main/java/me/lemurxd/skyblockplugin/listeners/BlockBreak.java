@@ -47,7 +47,7 @@ public class BlockBreak implements Listener {
 
         if (isGeneratorStone) {
             Bukkit.getScheduler().runTaskLater(SkyBlockPlugin.getInstance(), () -> {
-                if (block.getType() == Material.AIR) {
+                if (block.getType() == Material.AIR || block.getType() == Material.WATER) {
                     block.setType(Material.STONE);
                 }
             }, Config.GENERATOR_TIME_TO_REGEN.getInt() * 20L);

@@ -28,10 +28,13 @@ import net.md_5.bungee.api.chat.TextComponent;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CustomLore {
 
     public static final Set<UUID> developers = new HashSet<>();
+    private static final java.util.regex.Pattern HEX_PATTERN = java.util.regex.Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public static void build(ItemStack itemToBuild, Player player, int slot) {
         if (itemToBuild == null || itemToBuild.getType().equals(Material.AIR) || developers.contains(player.getUniqueId())) return;
@@ -93,6 +96,7 @@ public class CustomLore {
 
         String deadMendingTag = NBTUtil.getString(itemToBuild, "deadMending");
         boolean isDeadMending = deadMendingTag != null && !deadMendingTag.isEmpty();
+        int rerolls = getRerollCount(itemToBuild);
 
         String[] colors = colorFormat.split(":");
         String c1 = "&" + (colors.length > 0 ? colors[0] : "f");
@@ -155,7 +159,7 @@ public class CustomLore {
 
         Map<Enchantment, Integer> enchantsToProcess = new HashMap<>(baseStack.getEnchantments());
 
-        if (itemToBuild.containsEnchantment(Enchantment.MENDING)) {
+        if (itemToBuild.containsEnchantment(Enchantment.MENDING) || isDeadMending) {
             enchantsToProcess.put(Enchantment.MENDING, 1);
         }
 
@@ -205,6 +209,12 @@ public class CustomLore {
             newLore.add("");
             newLore.add(color(c1 + "\"" + uniqueText + "\""));
         }
+
+        if (rerolls > 0) {
+            newLore.add("");
+            newLore.add(color(" " + c2 + "» &8&oPrzekucia: &7" + rerolls));
+        }
+
         newLore.add(color(c1 + "&m------------------------------"));
 
         ItemStack finalItem = baseStack.clone();
@@ -262,8 +272,12 @@ public class CustomLore {
         if (uniqueText != null) finalItem = NBTUtil.setString(finalItem, "UniqueText", uniqueText);
         if (hasAbility) finalItem = NBTUtil.setString(finalItem, "ABILITY", abilityTag);
 
+        if (rerolls > 0) {
+            finalItem = NBTUtil.setInt(finalItem, "Rerolls", rerolls);
+        }
+
         if (isNewDiscovery) {
-            playDiscoveryEffect(player, currentRarityName);
+            playDiscoveryEffect(player, currentRarityName, finalMeta.getDisplayName());
         }
 
         ItemMeta handMeta = itemToBuild.getItemMeta();
@@ -298,7 +312,17 @@ public class CustomLore {
 
 
     private static String color(String text) {
-        return ChatColor.translateAlternateColorCodes('&', text);
+        if (text == null) return null;
+
+        java.util.regex.Matcher matcher = HEX_PATTERN.matcher(text);
+        StringBuffer buffer = new StringBuffer();
+        while (matcher.find()) {
+            matcher.appendReplacement(buffer, net.md_5.bungee.api.ChatColor.of("#" + matcher.group(1)).toString());
+        }
+        matcher.appendTail(buffer);
+        text = buffer.toString();
+
+        return org.bukkit.ChatColor.translateAlternateColorCodes('&', text);
     }
 
     private static double getRarityModifier(String rarityName) {
@@ -453,7 +477,7 @@ public class CustomLore {
         }
     }
 
-    private static void playDiscoveryEffect(Player player, String rarityName) {
+    private static void playDiscoveryEffect(Player player, String rarityName, String itemName) {
         String coloredDisplayName = rarityName;
         for (String entry : Config.RARITY_LIST.getStringList()) {
             String raw = ChatColor.stripColor(entry.split(":")[0]).trim();
@@ -471,8 +495,18 @@ public class CustomLore {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 60, 0));
                 player.playSound(player.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0f, 0.5f);
                 player.playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1.0f, 1.0f);
-
                 player.sendTitle(color(coloredDisplayName), color("&7Niesamowite znalezisko!"), 10, 40, 20);
+
+                for (String line : Config.MESSAGES_BROADCAST_LEGENDARY.getStringList()) {
+                    String formattedLine = line
+                            .replace("<player>", player.getName())
+                            .replace("<item>", itemName);
+                    org.bukkit.Bukkit.broadcastMessage(color(formattedLine));
+                }
+
+                for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
+                    p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 0.8f, 1.2f);
+                }
                 break;
 
             case "BOSKI":
@@ -480,8 +514,19 @@ public class CustomLore {
                 player.addPotionEffect(new PotionEffect(PotionEffectType.DARKNESS, 100, 0));
                 player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 0.5f);
                 player.playSound(player.getLocation(), Sound.BLOCK_END_PORTAL_SPAWN, 1.0f, 0f);
-
                 playMatrixAnimation(player);
+
+                for (String line : Config.MESSAGES_BROADCAST_GODLY.getStringList()) {
+                    String formattedLine = line
+                            .replace("<player>", player.getName())
+                            .replace("<item>", itemName);
+                    org.bukkit.Bukkit.broadcastMessage(color(formattedLine));
+                }
+
+                for (Player p : org.bukkit.Bukkit.getOnlinePlayers()) {
+                    p.playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 0.7f);
+                    p.playSound(p.getLocation(), Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0f, 0.6f);
+                }
                 break;
 
             default:
@@ -533,15 +578,15 @@ public class CustomLore {
         }.runTaskTimer(SkyBlockPlugin.getInstance(), 0L, 5L);
     }
 
-    public static void forceReroll(Player player) {
-        ItemStack item = player.getInventory().getItemInMainHand();
-        if (item == null || item.getType() == Material.AIR) return;
-
-        item = NBTUtil.remove(item, "Rarity");
-
-        player.getInventory().setItemInMainHand(item);
-
-        build(item, player, player.getInventory().getHeldItemSlot());
+    private static int getRerollCount(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return 0;
+        try {
+            Integer val = NBTUtil.getInt(item, "Rerolls");
+            if (val != null) {
+                return val;
+            }
+        } catch (Exception ignored) {}
+        return 0;
     }
 
 

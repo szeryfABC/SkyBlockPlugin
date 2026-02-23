@@ -10,6 +10,9 @@ import me.lemurxd.skyblockplugin.SkyBlockPlugin;
 import me.lemurxd.skyblockplugin.enums.Config;
 import me.lemurxd.skyblockplugin.lore.CustomLore;
 import me.lemurxd.skyblockplugin.lore.Rarity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -338,9 +341,20 @@ public class CraftingMenu implements Listener {
     }
 
     private static String getMythicDisplayName(String internalName) {
-        Optional<MythicItem> item = MythicBukkit.inst().getItemManager().getItem(internalName);
-        if (item.isPresent()) {
-            return color(item.get().getDisplayName());
+        try {
+            Optional<MythicItem> item = MythicBukkit.inst().getItemManager().getItem(internalName);
+            if (item.isPresent()) {
+                String rawName = item.get().getDisplayName();
+
+                Component component = MiniMessage.miniMessage().deserialize(rawName);
+                return LegacyComponentSerializer.builder()
+                        .hexColors()
+                        .useUnusualXRepeatedCharacterHexFormat()
+                        .build()
+                        .serialize(component);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return internalName;
     }

@@ -40,7 +40,7 @@ public enum Config {
 
     //Messages
     MESSAGES_ONLY_PLAYERS("messages.only_for_players", "<prefix>&cTa komenda jest dostępna tylko dla graczy!", true),
-    MESSAGES_NOT_ENOUGH_MONEY("messages.not_enough_money", "<prefix>&cNie masz wystarczająco pieniędzy!"),
+    MESSAGES_NOT_ENOUGH_MONEY("messages.not_enough_money", "<prefix>&cNie masz wystarczająco pieniędzy!", true),
     MESSAGES_ORB_COOLDOWN("messages.orb.coldown_message", "<prefix>&cMusisz odczekać jeszcze: <formattedTime>", true),
     MESSAGES_ORB_GIVE("messages.org.given_message", "<prefix>&aOdebrałeś Magicznego Orba!", true),
     MESSAGES_DROP_DATABASE_PROBLEM("messages.drop.database_problem", "<prefix>&cBłąd: Nie załadowano Twoich danych!", true),
@@ -52,6 +52,24 @@ public enum Config {
     MESSAGES_BLACKSMITH_ALREADY_MENDING("messages.blacksmith.already_mending", "<prefix>&cTen przedmiot ma już Mending!", true),
     MESSAGES_BLACKSMITH_CANNOT_ENCHANT("messages.blacksmith.cannot_enchant", "<prefix>&cTego przedmiotu nie można zakląć!", true),
     MESSAGES_BLACKSMITH_NO_FUNDS("messages.blacksmith.no_funds", "<prefix>&cNie stać Cię na to! Brakuje pieniędzy lub przedmiotów.", true),
+    MESSAGES_BROADCAST_LEGENDARY("messages.broadcast.legendary", Arrays.asList(
+            "",
+            "&6&l★ &e&lLEGENDARNY DROP &6&l★",
+            "&7Gracz &e<player> &7właśnie wydropił potężny artefakt:",
+            "&8» <item>",
+            ""
+    ), true),
+
+    MESSAGES_BROADCAST_GODLY("messages.broadcast.godly", Arrays.asList(
+            "",
+            "&4&k||| &c&lBOSKA INTERWENCJA &4&k|||",
+            "&7Niemożliwe stało się możliwym...",
+            "&7Niebiosa obdarowały gracza &c&l<player>",
+            "&7ostatecznym przedmiotem:",
+            "&8» <item>",
+            "&4&k||| &c&lBOSKA INTERWENCJA &4&k|||",
+            ""
+    ), true),
 
     //DROP
     DROP_LEVELS("drop.levels_cost", Arrays.asList("5000", "20000", "50000", "100000")),

@@ -15,6 +15,7 @@ public class Inventory implements Listener {
 
     private final DropMenu dropMenu = new DropMenu();
 
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (event.getView().getTitle().isEmpty()) return;

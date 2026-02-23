@@ -1,7 +1,10 @@
 package me.lemurxd.skyblockplugin.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import world.bentobox.bentobox.BentoBox;
+import world.bentobox.bentobox.api.user.User;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +35,7 @@ public class BaseFile {
     }
 
     public void setNether(String uuid, boolean allowed) {
+        BentoBox.getInstance().getIslandsManager().getIsland(Bukkit.getWorld("bskyblock_world"), Bukkit.getPlayerUniqueId("sd"));
         getData(uuid).nether = allowed;
         saveAndSet(uuid, "nether", allowed);
     }

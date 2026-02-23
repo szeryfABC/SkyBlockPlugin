@@ -17,6 +17,7 @@ commands:
     description: Otwiera menu zarządzania dropem
     usage: /drop
   orb:
+    permission: sbp.orb
     description: Daje graczowi orba
     usage: /orb
 

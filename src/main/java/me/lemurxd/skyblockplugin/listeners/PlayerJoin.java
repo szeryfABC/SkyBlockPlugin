@@ -38,6 +38,8 @@ public class PlayerJoin implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent e) {
+        if (SkyBlockPlugin.getDbManager() == null) return;
+
         Player player = e.getPlayer();
 
         SkyBlockPlugin.getDbManager().loadPlayerInventory(player);

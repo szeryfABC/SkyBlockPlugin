@@ -27,8 +27,6 @@ import java.util.Optional;
 
 public class NetherMenu implements Listener {
 
-    private Economy economy = SkyBlockPlugin.getEconomy();
-
     public void open(Player player) {
         int rows = Config.NETHER_MENU_ROWS.getInt();
         String title = Config.NETHER_MENU_TITLE.getString();
@@ -42,7 +40,9 @@ public class NetherMenu implements Listener {
 
         String uuid = player.getUniqueId().toString();
 
-        boolean hasKowal = SkyBlockPlugin.getData().isKowalUnlocked(uuid);
+        Island island = BentoBox.getInstance().getIslandsManager().getIslandAt(player.getLocation()).get();
+
+        boolean hasKowal = SkyBlockPlugin.getData().isKowalUnlocked(island.getUniqueId());
         ItemStack kowalItem = createItem(
                 Material.valueOf(Config.NETHER_KOWAL_MATERIAL.getString()),
                 Config.NETHER_KOWAL_NAME.getString(),
@@ -52,7 +52,7 @@ public class NetherMenu implements Listener {
         );
         inv.setItem(Config.NETHER_KOWAL_SLOT.getInt(), kowalItem);
 
-        boolean hasHordy = SkyBlockPlugin.getData().isHordyUnlocked(uuid);
+        boolean hasHordy = SkyBlockPlugin.getData().isHordyUnlocked(island.getUniqueId());
         ItemStack hordyItem = createItem(
                 Material.valueOf(Config.NETHER_HORDY_MATERIAL.getString()),
                 Config.NETHER_HORDY_NAME.getString(),
@@ -100,10 +100,11 @@ public class NetherMenu implements Listener {
         if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR) return;
         Player p = (Player) e.getWhoClicked();
         String uuid = p.getUniqueId().toString();
+        String islandUuid = BentoBox.getInstance().getIslandsManager().getIslandAt(e.getWhoClicked().getLocation()).get().getUniqueId();
         int slot = e.getSlot();
 
         if (slot == Config.NETHER_KOWAL_SLOT.getInt()) {
-            if (SkyBlockPlugin.getData().isKowalUnlocked(uuid)) {
+            if (SkyBlockPlugin.getData().isKowalUnlocked(islandUuid)) {
                 p.sendMessage(Config.NETHER_MSG_ALREADY_OWNED.getString());
                 p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
                 return;
@@ -111,7 +112,7 @@ public class NetherMenu implements Listener {
 
             int cost = Config.NETHER_KOWAL_COST.getInt();
             if (buyFeature(p, cost)) {
-                SkyBlockPlugin.getData().setKowal(uuid, true);
+                SkyBlockPlugin.getData().setKowal(islandUuid, true);
                 p.sendMessage(Config.NETHER_MSG_BOUGHT.getString().replace("<feature>", "Siedziba Kowala"));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
@@ -125,7 +126,7 @@ public class NetherMenu implements Listener {
         }
 
         else if (slot == Config.NETHER_HORDY_SLOT.getInt()) {
-            if (SkyBlockPlugin.getData().isHordyUnlocked(uuid)) {
+            if (SkyBlockPlugin.getData().isHordyUnlocked(islandUuid)) {
                 p.sendMessage(Config.NETHER_MSG_ALREADY_OWNED.getString());
                 p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
                 return;
@@ -133,7 +134,7 @@ public class NetherMenu implements Listener {
 
             int cost = Config.NETHER_HORDY_COST.getInt();
             if (buyFeature(p, cost)) {
-                SkyBlockPlugin.getData().setHordy(uuid, true);
+                SkyBlockPlugin.getData().setHordy(islandUuid, true);
                 p.sendMessage(Config.NETHER_MSG_BOUGHT.getString().replace("<feature>", "Piekielne Hordy"));
                 p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
 
@@ -148,13 +149,13 @@ public class NetherMenu implements Listener {
     }
 
     private boolean buyFeature(Player p, int cost) {
-        if (economy == null) {
+        if (SkyBlockPlugin.getEconomy() == null) {
             p.sendMessage("§cBłąd: Brak wtyczki Vault/Economy!");
             return false;
         }
 
-        if (economy.getBalance(p) >= cost) {
-            economy.withdrawPlayer(p, cost);
+        if (SkyBlockPlugin.getEconomy().getBalance(p) >= cost) {
+            SkyBlockPlugin.getEconomy().withdrawPlayer(p, cost);
             return true;
         } else {
             p.sendMessage(Config.MESSAGES_NOT_ENOUGH_MONEY.getString());

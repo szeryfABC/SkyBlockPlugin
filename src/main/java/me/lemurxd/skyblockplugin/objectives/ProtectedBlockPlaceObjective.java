@@ -97,6 +97,13 @@ public class ProtectedBlockPlaceObjective extends BukkitCustomObjective implemen
 
             removeProtectedBlock(player.getUniqueId(), loc);
 
+            Material mat = block.getType();
+            if (mat.name().contains("WHEAT") || mat.name().contains("CARROT") ||
+                    mat.name().contains("POTATO") || mat.name().contains("BEETROOT") ||
+                    mat.name().contains("SUGAR_CANE")) {
+                return;
+            }
+
             event.setDropItems(false);
             event.setExpToDrop(0);
 
